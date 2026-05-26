@@ -993,32 +993,16 @@ loadAll();
 
 // Read URL parameters (e.g. ?steps=8432&weight=71.8)
 (function(){
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('steps')) {
-    state.vitals.steps = params.get('steps');
-    saveAll();
-  }
-  if(params.get('weight')) {
-    state.vitals.weight = params.get('weight');
-    saveAll();
-  }
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('steps')) { state.vitals.steps = params.get('steps'); saveAll(); }
+  if(params.get('weight')) { state.vitals.weight = params.get('weight'); saveAll(); }
 })();
 
-var _hour = new Date().getHours();
-var _greeting = _hour < 12 ? 'Good morning' : _hour < 17 ? 'Good afternoon' : 'Good evening';
-document.querySelector('.app-title').textContent = _greeting + ', Dex.';
-var hour = new Date().getHours();
-var greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-document.querySelector('.app-title').textContent = greeting + ', Dex.';
 var _h = new Date().getHours();
-var _greet = _h < 12 ? 'Good morning' : _h < 17 ? 'Good afternoon' : 'Good evening';
-document.getElementById('greeting').textContent = _greet + ', Dex.';
-var _h = new Date().getHours();
-var _greet = _h < 12 ? 'Good morning' : _h < 17 ? 'Good afternoon' : 'Good evening';
-document.getElementById('greeting').textContent = _greet + ', Dex.';
-document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-HK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-document.getElementById('webhook-url').value=settings.webhookUrl||'';
-document.getElementById('apps-script-code').textContent=APPS_SCRIPT;
+document.getElementById('greeting').textContent = (_h < 12 ? 'Good morning' : _h < 17 ? 'Good afternoon' : 'Good evening') + ', Dex.';
+document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-HK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('webhook-url').value = settings.webhookUrl||'';
+document.getElementById('apps-script-code').textContent = APPS_SCRIPT;
 renderDash();
 renderMeals();
 renderActivities();
