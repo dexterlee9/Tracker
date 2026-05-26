@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Dexter's Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #efefea;
+  --border: rgba(0,0,0,0.08);
+  --border-med: rgba(0,0,0,0.14);
+  --text: #1a1916;
+  --muted: #7a7870;
+  --accent-bg: #1a1916;
+  --accent-text: #f5f4f0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --tab-h: 60px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow: hidden; }
+body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; position: relative; }
+.page { display: none; flex: 1; overflow-y: auto; padding: 0 0 calc(var(--tab-h) + 16px); }
+.page.active { display: block; }
+.page-inner { padding: 16px 16px 0; }
+.app-header { padding: 20px 16px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+.app-title { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; }
+.app-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 3px; }
+.sync-btn { background: var(--surface); border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px; font-family: 'Syne', sans-serif; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.sync-btn.syncing { color: #2563eb; }
+.sync-btn.ok { color: #2d6a4f; }
+.sync-btn.error { color: #991b1b; }
+.tabs { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; height: var(--tab-h); z-index: 100; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; font-size: 10px; font-family: 'Syne', sans-serif; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; border: none; background: none; padding-bottom: 4px; }
+.tab.active { color: var(--text); }
+.tab-icon { font-size: 20px; line-height: 1; }
+.card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; }
+.card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+.dash-vitals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.vital-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.vital-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+.vital-input { width: 100%; border: none; background: none; font-size: 28px; font-weight: 700; font-family: 'Syne', sans-serif; color: var(--text); letter-spacing: -0.03em; outline: none; padding: 0; }
+.vital-input::placeholder { color: var(--muted); }
+.vital-unit { font-size: 13px; font-weight: 400; color: var(--muted); }
+.macro-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.macro-row:last-child { margin-bottom: 0; }
+.macro-name { font-size: 12px; font-weight: 500; width: 60px; flex-shrink: 0; }
+.macro-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
+.macro-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.bar-kcal { background: var(--text); }
+.bar-protein { background: #2563eb; }
+.bar-carbs { background: #d97706; }
+.bar-fat { background: #db2777; }
+.macro-nums { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-align: right; width: 72px; flex-shrink: 0; }
+.macro-pct { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; width: 36px; text-align: right; flex-shrink: 0; }
+.kcal-big { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
+.kcal-num { font-size: 42px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+.kcal-target { font-size: 13px; color: var(--muted); text-align: right; }
+.kcal-remain { font-size: 18px; font-weight: 600; }
+.btn { border-radius: var(--radius-sm); padding: 10px 16px; font-size: 13px; font-family: 'Syne', sans-serif; font-weight: 600; cursor: pointer; border: 0.5px solid var(--border-med); background: var(--surface); color: var(--text); transition: all 0.15s; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-bg); flex: 1; }
+.btn-sm { padding: 7px 12px; font-size: 12px; }
+.status-line { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); min-height: 16px; margin-bottom: 6px; }
+.status-line.loading { color: #2563eb; }
+.status-line.err { color: #991b1b; }
+.meal-input { width: 100%; border: 0.5px solid var(--border-med); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; font-family: 'Syne', sans-serif; background: var(--surface); color: var(--text); resize: none; height: 72px; outline: none; }
+.meal-input:focus { border-color: var(--text); }
+.log-actions { display: flex; gap: 8px; margin-top: 8px; }
+.meal-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 11px 0; border-bottom: 0.5px solid var(--border); gap: 8px; }
+.meal-item:last-child { border-bottom: none; }
+.meal-item-name { font-size: 13px; font-weight: 500; flex: 1; }
+.meal-item-time { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.meal-item-macros { text-align: right; flex-shrink: 0; }
+.meal-item-kcal { font-size: 14px; font-weight: 700; }
+.meal-item-detail { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.empty-msg { text-align: center; padding: 24px; color: var(--muted); font-size: 13px; }
+.routine-picker { display: flex; gap: 8px; margin-bottom: 12px; }
+.routine-btn { flex: 1; padding: 10px 8px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-med); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); transition: all 0.15s; }
+.routine-btn.active { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-bg); }
+.exercise-item { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.exercise-item:last-child { border-bottom: none; }
+.exercise-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.exercise-name { font-size: 13px; font-weight: 600; flex: 1; }
+.exercise-remove { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 18px; padding: 0 0 0 8px; line-height: 1; }
+.exercise-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+.ex-field { display: flex; flex-direction: column; gap: 3px; }
+.ex-label { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: 0.06em; }
+.ex-input { border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 14px; font-family: 'DM Mono', monospace; font-weight: 500; background: var(--surface2); color: var(--text); outline: none; width: 100%; }
+.ex-input:focus { border-color: var(--text); background: var(--surface); }
+.add-exercise { display: flex; gap: 8px; margin-top: 12px; }
+.add-exercise input { flex: 1; border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; font-family: 'Syne', sans-serif; background: var(--surface); color: var(--text); outline: none; }
+.activity-types { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.activity-type-btn { padding: 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-med); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); transition: all 0.15s; }
+.activity-type-btn.active { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-bg); }
+.activity-log-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 0.5px solid var(--border); }
+.activity-log-item:last-child { border-bottom: none; }
+.act-name { font-size: 13px; font-weight: 600; }
+.act-time { font-size: 11px; color: var(--muted); }
+.act-dur { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; }
+.section-sep { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin: 16px 0 8px; }
+.settings-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.settings-row:last-child { border-bottom: none; }
+.settings-label { font-size: 13px; font-weight: 500; }
+.settings-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.settings-input { border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; font-family: 'DM Mono', monospace; background: var(--surface2); color: var(--text); outline: none; width: 100%; }
+
+/* TREND CHARTS */
+.trend-section { margin-bottom: 10px; }
+.trend-loading { text-align: center; padding: 20px; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
+.chart-wrap { position: relative; width: 100%; height: 140px; }
+.gym-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border-radius: 20px; padding: 5px 10px; font-size: 12px; font-weight: 600; margin: 3px 3px 3px 0; }
+.gym-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text); flex-shrink: 0; }
+.gym-grid { display: flex; flex-wrap: wrap; }
+
+::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dash">
+  <div class="app-header">
+    <div>
+      <div class="app-title">Good morning, Dex.</div>
+      <div class="app-date" id="dash-date"></div>
+    </div>
+    <button class="sync-btn" id="sync-btn" onclick="syncToSheets()">↑ Sync</button>
+  </div>
+  <div class="page-inner">
+    <div class="dash-vitals">
+      <div class="vital-card">
+        <div class="vital-label">Morning weight</div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <input class="vital-input" id="weight-input" type="number" step="0.1" placeholder="—" oninput="saveVitals()">
+          <span class="vital-unit">kg</span>
+        </div>
+      </div>
+      <div class="vital-card">
+        <div class="vital-label">Steps</div>
+        <input class="vital-input" id="steps-input" type="number" placeholder="—" oninput="saveVitals()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="kcal-big">
+        <div>
+          <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">Calories</div>
+          <div class="kcal-num" id="d-kcal">0</div>
+        </div>
+        <div class="kcal-target">
+          <div class="kcal-remain" id="d-kcal-remain">1,764</div>
+          <div>remaining</div>
+          <div style="margin-top:4px;font-family:'DM Mono',monospace;font-size:11px;" id="d-kcal-pct">0% of target</div>
+        </div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-name">Protein</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-protein" id="d-bar-p" style="width:0%"></div></div>
+        <div class="macro-nums" id="d-p-nums">0 / 150g</div>
+        <div class="macro-pct" id="d-p-pct">0%</div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-name">Carbs</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-carbs" id="d-bar-c" style="width:0%"></div></div>
+        <div class="macro-nums" id="d-c-nums">0 / 150g</div>
+        <div class="macro-pct" id="d-c-pct">0%</div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-name">Fat</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-fat" id="d-bar-f" style="width:0%"></div></div>
+        <div class="macro-nums" id="d-f-nums">0 / 63g</div>
+        <div class="macro-pct" id="d-f-pct">0%</div>
+      </div>
+    </div>
+
+    <!-- TRENDS -->
+    <div class="section-sep">7-day trends</div>
+    <div id="trends-container">
+      <div class="trend-loading" id="trends-loading">Fetching trends…</div>
+    </div>
+
+    <div id="dash-gym-summary"></div>
+    <div id="dash-activity-summary"></div>
+  </div>
+</div>
+
+<!-- NUTRITION -->
+<div class="page" id="page-nutrition">
+  <div class="page-inner">
+    <div class="section-sep">Log a meal</div>
+    <textarea class="meal-input" id="meal-input" placeholder="e.g. 150g chicken breast, 200g white rice, side salad…"></textarea>
+    <div class="status-line" id="meal-status"></div>
+    <div class="log-actions">
+      <button class="btn btn-primary" onclick="logMeal()">Estimate & log ↗</button>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <div class="macro-row">
+        <div class="macro-name" style="font-size:11px;color:var(--muted)">Kcal</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-kcal" id="n-bar-k" style="width:0%"></div></div>
+        <div class="macro-nums" id="n-k-nums">0 / 1764</div>
+        <div class="macro-pct" id="n-k-pct">0%</div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-name" style="font-size:11px;color:var(--muted)">Protein</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-protein" id="n-bar-p" style="width:0%"></div></div>
+        <div class="macro-nums" id="n-p-nums">0 / 150g</div>
+        <div class="macro-pct" id="n-p-pct">0%</div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-name" style="font-size:11px;color:var(--muted)">Carbs</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-carbs" id="n-bar-c" style="width:0%"></div></div>
+        <div class="macro-nums" id="n-c-nums">0 / 150g</div>
+        <div class="macro-pct" id="n-c-pct">0%</div>
+      </div>
+      <div class="macro-row">
+        <div class="macro-name" style="font-size:11px;color:var(--muted)">Fat</div>
+        <div class="macro-bar-wrap"><div class="macro-bar bar-fat" id="n-bar-f" style="width:0%"></div></div>
+        <div class="macro-nums" id="n-f-nums">0 / 63g</div>
+        <div class="macro-pct" id="n-f-pct">0%</div>
+      </div>
+    </div>
+    <div class="section-sep">Meals today</div>
+    <div id="meal-list"><div class="empty-msg">No meals logged yet</div></div>
+  </div>
+</div>
+
+<!-- GYM -->
+<div class="page" id="page-gym">
+  <div class="page-inner">
+    <div class="section-sep">Select routine</div>
+    <div class="routine-picker">
+      <button class="routine-btn active" onclick="selectRoutine('rdl',this)">RDL</button>
+      <button class="routine-btn" onclick="selectRoutine('squat',this)">Squat</button>
+      <button class="routine-btn" onclick="selectRoutine('glute',this)">Glute Bridge</button>
+    </div>
+    <div class="section-sep">Exercises</div>
+    <div class="card" style="padding:8px 16px">
+      <div id="exercise-list"></div>
+      <div class="add-exercise">
+        <input type="text" id="add-ex-input" placeholder="Add exercise…" onkeydown="if(event.key==='Enter')addExercise()">
+        <button class="btn btn-sm" onclick="addExercise()">+ Add</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="saveGymSession()">Save session</button>
+    <div class="status-line" id="gym-status" style="margin-top:8px;text-align:center"></div>
+  </div>
+</div>
+
+<!-- ACTIVITY -->
+<div class="page" id="page-activity">
+  <div class="page-inner">
+    <div class="section-sep">Activity type</div>
+    <div class="activity-types">
+      <button class="activity-type-btn active" onclick="selectActivity('Tennis',this)">🎾 Tennis</button>
+      <button class="activity-type-btn" onclick="selectActivity('Golf',this)">⛳ Golf</button>
+      <button class="activity-type-btn" onclick="selectActivity('Walk',this)">🚶 Walk</button>
+      <button class="activity-type-btn" onclick="selectActivity('Run',this)">🏃 Run</button>
+      <button class="activity-type-btn" onclick="selectActivity('Swim',this)">🏊 Swim</button>
+      <button class="activity-type-btn" onclick="selectActivity('Cycle',this)">🚴 Cycle</button>
+    </div>
+    <div class="card">
+      <div class="ex-field">
+        <div class="ex-label">Duration (minutes)</div>
+        <input class="ex-input" id="activity-duration" type="number" placeholder="60" style="width:100%;font-size:24px;padding:12px;">
+      </div>
+      <div style="margin-top:10px">
+        <div class="ex-label">Notes (optional)</div>
+        <input class="ex-input" id="activity-notes" type="text" placeholder="e.g. Club final, 18 holes" style="width:100%;margin-top:4px;">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:2px" onclick="logActivity()">Log activity</button>
+    <div class="status-line" id="activity-status" style="margin-top:8px;text-align:center"></div>
+    <div class="section-sep">Today's activities</div>
+    <div id="activity-list"><div class="empty-msg">No activities logged yet</div></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="page-inner">
+    <div class="section-sep">Google Sheets</div>
+    <div class="card">
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+        <div>
+          <div class="settings-label">Webhook URL</div>
+          <div class="settings-sub">Paste your Apps Script deployment URL here</div>
+        </div>
+        <input class="settings-input" id="webhook-url" placeholder="https://script.google.com/macros/s/…" oninput="saveSettings()">
+      </div>
+    </div>
+    <div class="section-sep">Apps Script code</div>
+    <div class="card" style="background:var(--surface2)">
+      <pre id="apps-script-code" style="font-family:'DM Mono',monospace;font-size:10px;white-space:pre-wrap;color:var(--text);line-height:1.6"></pre>
+      <button class="btn btn-sm" style="margin-top:10px;width:100%" onclick="copyScript()">Copy script</button>
+    </div>
+    <div class="section-sep">Setup guide</div>
+    <div class="card" style="font-size:13px;line-height:1.7;color:var(--muted)">
+      <ol style="padding-left:18px;display:flex;flex-direction:column;gap:6px;">
+        <li>Create a new Google Sheet</li>
+        <li>Go to <b style="color:var(--text)">Extensions → Apps Script</b></li>
+        <li>Paste the Apps Script code above</li>
+        <li>Click <b style="color:var(--text)">Deploy → New deployment → Web app</b></li>
+        <li>Set access to <b style="color:var(--text)">"Anyone"</b>, copy the URL</li>
+        <li>Paste URL above and tap Sync on dashboard</li>
+      </ol>
+    </div>
+    <div class="section-sep">Data</div>
+    <div class="card">
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Reset today's data</div>
+          <div class="settings-sub">Clears all entries for today</div>
+        </div>
+        <button class="btn btn-sm" onclick="resetDay()" style="color:#991b1b;border-color:#991b1b">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" onclick="switchTab('dash',this)">
+    <span class="tab-icon">◈</span><span>Today</span>
+  </button>
+  <button class="tab" onclick="switchTab('nutrition',this)">
+    <span class="tab-icon">⊕</span><span>Nutrition</span>
+  </button>
+  <button class="tab" onclick="switchTab('gym',this)">
+    <span class="tab-icon">◎</span><span>Gym</span>
+  </button>
+  <button class="tab" onclick="switchTab('activity',this)">
+    <span class="tab-icon">◉</span><span>Activity</span>
+  </button>
+  <button class="tab" onclick="switchTab('settings',this)">
+    <span class="tab-icon">⊞</span><span>Settings</span>
+  </button>
+</nav>
+
+<script>
+const TARGETS = { kcal: 1764, p: 150, c: 150, f: 63 };
+const TODAY = new Date().toISOString().slice(0,10);
+
+const ROUTINES = {
+  rdl: { name:'RDL', exercises:['Romanian Deadlift','Weighted Neutral Grip Pull Up','Barbell Reverse Lunge','Dumbbell Decline Bench Press','High to Low Cable Row','Seated Leg Extension','Cable Face Pull','Cable Bent Over Overhead Tricep Extension'] },
+  squat: { name:'Squat', exercises:['Back Squat','Dual Dumbbell Modified Seal Row','Clavicular Cable Pec Fly','Dumbbell Incline Bench Press','Cable Rear Delt Fly','Farmers Walk','Cable Lateral Delt Raise (Back Facing)'] },
+  glute: { name:'Glute Bridge', exercises:['Leg Press','Landmine Bent Over Rope Row','Dumbbell Flat Bench Press','Kas Glute Bridge','Dual Dumbbell Seated Press','Dumbbell Bicep Curl','Cable Bent Over Overhead Tricep Extension','Hamstring Curl on Machine','Cable Kneeling Crunch'] }
+};
+
+let state = { date:TODAY, vitals:{weight:'',steps:''}, nutrition:{meals:[],totals:{kcal:0,p:0,c:0,f:0}}, gym:{routine:'rdl',exercises:[],saved:false}, activities:[] };
+let settings = { webhookUrl:'' };
+let selectedActivity = 'Tennis';
+let currentRoutine = 'rdl';
+let gymExercises = [];
+let trendCharts = {};
+
+function loadAll() {
+  try {
+    const s = localStorage.getItem('dx_tracker_' + TODAY);
+    if (s) state = JSON.parse(s);
+    const cfg = localStorage.getItem('dx_settings');
+    if (cfg) settings = JSON.parse(cfg);
+  } catch(e) {}
+}
+
+function saveAll() {
+  try {
+    localStorage.setItem('dx_tracker_' + TODAY, JSON.stringify(state));
+    localStorage.setItem('dx_settings', JSON.stringify(settings));
+  } catch(e) {}
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'gym') renderGym();
+  if (tab === 'dash') renderDash();
+}
+
+function saveVitals() {
+  state.vitals.weight = document.getElementById('weight-input').value;
+  state.vitals.steps = document.getElementById('steps-input').value;
+  saveAll();
+}
+
+function pct(v, max) { return Math.min(100, Math.round((v/max)*100)); }
+function fmt1(v) { return parseFloat(v||0).toFixed(1); }
+
+function renderMacros() {
+  const t = state.nutrition.totals;
+  document.getElementById('d-kcal').textContent = Math.round(t.kcal).toLocaleString();
+  document.getElementById('d-kcal-remain').textContent = Math.round(TARGETS.kcal - t.kcal).toLocaleString();
+  document.getElementById('d-kcal-pct').textContent = pct(t.kcal, TARGETS.kcal) + '% of target';
+  [['d-bar-p','d-p-nums','d-p-pct',t.p,TARGETS.p,'g'],
+   ['d-bar-c','d-c-nums','d-c-pct',t.c,TARGETS.c,'g'],
+   ['d-bar-f','d-f-nums','d-f-pct',t.f,TARGETS.f,'g']].forEach(([bar,nums,pctEl,val,max,unit]) => {
+    document.getElementById(bar).style.width = pct(val,max) + '%';
+    document.getElementById(nums).textContent = fmt1(val) + ' / ' + max + unit;
+    document.getElementById(pctEl).textContent = pct(val,max) + '%';
+  });
+  document.getElementById('n-bar-k').style.width = pct(t.kcal,TARGETS.kcal)+'%';
+  document.getElementById('n-k-nums').textContent = Math.round(t.kcal)+' / 1764';
+  document.getElementById('n-k-pct').textContent = pct(t.kcal,TARGETS.kcal)+'%';
+  document.getElementById('n-bar-p').style.width = pct(t.p,TARGETS.p)+'%';
+  document.getElementById('n-p-nums').textContent = fmt1(t.p)+' / 150g';
+  document.getElementById('n-p-pct').textContent = pct(t.p,TARGETS.p)+'%';
+  document.getElementById('n-bar-c').style.width = pct(t.c,TARGETS.c)+'%';
+  document.getElementById('n-c-nums').textContent = fmt1(t.c)+' / 150g';
+  document.getElementById('n-c-pct').textContent = pct(t.c,TARGETS.c)+'%';
+  document.getElementById('n-bar-f').style.width = pct(t.f,TARGETS.f)+'%';
+  document.getElementById('n-f-nums').textContent = fmt1(t.f)+' / 63g';
+  document.getElementById('n-f-pct').textContent = pct(t.f,TARGETS.f)+'%';
+}
+
+function renderDash() {
+  renderMacros();
+  document.getElementById('weight-input').value = state.vitals.weight || '';
+  document.getElementById('steps-input').value = state.vitals.steps || '';
+  const gymEl = document.getElementById('dash-gym-summary');
+  if (state.gym.saved && state.gym.exercises.length) {
+    gymEl.innerHTML = `<div class="card"><div class="card-title">Gym · ${ROUTINES[state.gym.routine]?.name||''}</div><div style="font-size:13px;color:var(--muted)">${state.gym.exercises.length} exercises completed</div></div>`;
+  } else gymEl.innerHTML = '';
+  const actEl = document.getElementById('dash-activity-summary');
+  if (state.activities.length) {
+    actEl.innerHTML = `<div class="card"><div class="card-title">Activities</div>${state.activities.map(a=>`<div class="activity-log-item"><div><div class="act-name">${a.type}</div><div class="act-time">${a.time}</div></div><div class="act-dur">${a.duration}m</div></div>`).join('')}</div>`;
+  } else actEl.innerHTML = '';
+  loadTrends();
+}
+
+// ─── TRENDS ──────────────────────────────────────────────────
+async function loadTrends() {
+  const url = settings.webhookUrl;
+  const container = document.getElementById('trends-container');
+  if (!url) {
+    container.innerHTML = '<div class="trend-loading">Add webhook URL in Settings to see trends</div>';
+    return;
+  }
+  document.getElementById('trends-loading').style.display = 'block';
+  try {
+    const res = await fetch(url + '?action=trends', { mode: 'cors' });
+    const data = await res.json();
+    renderTrends(data);
+  } catch(e) {
+    container.innerHTML = '<div class="trend-loading">Could not load trends — sync some data first</div>';
+  }
+}
+
+function renderTrends(data) {
+  const container = document.getElementById('trends-container');
+  if (!data || !data.weight || data.weight.length === 0) {
+    container.innerHTML = '<div class="trend-loading">No trend data yet — sync a few days to see trends</div>';
+    return;
+  }
+
+  const labels = data.dates.map(d => {
+    const parts = d.split('-');
+    return parts[1]+'/'+parts[2];
+  });
+
+  // Destroy old charts
+  Object.values(trendCharts).forEach(c => c.destroy());
+  trendCharts = {};
+
+  container.innerHTML = `
+    <div class="card trend-section">
+      <div class="card-title">Morning weight (kg)</div>
+      <div class="chart-wrap"><canvas id="chart-weight" role="img" aria-label="7 day morning weight trend"></canvas></div>
+    </div>
+    <div class="card trend-section">
+      <div class="card-title">Calories & protein</div>
+      <div class="chart-wrap"><canvas id="chart-nutrition" role="img" aria-label="7 day calorie and protein trend"></canvas></div>
+    </div>
+    <div class="card trend-section">
+      <div class="card-title">Gym sessions</div>
+      <div class="gym-grid" id="gym-trend-grid"></div>
+    </div>
+  `;
+
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' } },
+      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' } }
+    }
+  };
+
+  // Weight chart
+  trendCharts.weight = new Chart(document.getElementById('chart-weight'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: data.weight.map(v => v || null),
+        borderColor: '#1a1916',
+        backgroundColor: 'rgba(26,25,22,0.06)',
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: '#1a1916',
+        fill: true,
+        tension: 0.3,
+        spanGaps: true
+      }]
+    },
+    options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: data.weight.filter(Boolean).length ? Math.min(...data.weight.filter(Boolean)) - 1 : 60 } } }
+  });
+
+  // Nutrition chart
+  trendCharts.nutrition = new Chart(document.getElementById('chart-nutrition'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Kcal',
+          data: data.kcal,
+          backgroundColor: 'rgba(26,25,22,0.15)',
+          borderColor: '#1a1916',
+          borderWidth: 1,
+          yAxisID: 'y',
+          order: 2
+        },
+        {
+          label: 'Protein',
+          data: data.protein,
+          borderColor: '#2563eb',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#2563eb',
+          type: 'line',
+          yAxisID: 'y1',
+          tension: 0.3,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' } },
+        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' }, position: 'left' },
+        y1: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#2563eb' }, position: 'right' }
+      }
+    }
+  });
+
+  // Gym pills
+  const gymGrid = document.getElementById('gym-trend-grid');
+  if (data.gym && data.gym.length) {
+    gymGrid.innerHTML = data.gym.map(g => `
+      <div class="gym-pill">
+        <div class="gym-dot"></div>
+        <span>${g.date_label} · ${g.routine}</span>
+      </div>`).join('');
+  } else {
+    gymGrid.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0">No gym sessions logged yet</div>';
+  }
+
+  // Legend for nutrition chart
+  const legendHtml = `
+    <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--muted)">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1a1916;display:inline-block"></span>Kcal</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:#2563eb;display:inline-block"></span>Protein (g)</span>
+    </div>`;
+  document.getElementById('chart-nutrition').closest('.card').insertAdjacentHTML('beforeend', legendHtml);
+}
+
+// ─── MEAL LOGGING ─────────────────────────────────────────────
+function renderMeals() {
+  renderMacros();
+  const list = document.getElementById('meal-list');
+  if (!state.nutrition.meals.length) { list.innerHTML = '<div class="empty-msg">No meals logged yet</div>'; return; }
+  list.innerHTML = state.nutrition.meals.map(m => `
+    <div class="meal-item">
+      <div><div class="meal-item-name">${m.name}</div><div class="meal-item-time">${m.time}</div></div>
+      <div class="meal-item-macros">
+        <div class="meal-item-kcal">${Math.round(m.kcal)} kcal</div>
+        <div class="meal-item-detail">P${fmt1(m.p)} · C${fmt1(m.c)} · F${fmt1(m.f)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function setStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status-line' + (type ? ' '+type : '');
+}
+
+async function logMeal() {
+  const input = document.getElementById('meal-input');
+  const text = input.value.trim();
+  if (!text) return;
+  setStatus('meal-status','Estimating macros…','loading');
+  input.disabled = true;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:200,
+        system:`You are a nutrition assistant. Return ONLY a JSON object, no markdown, no backticks.
+Format: {"name":"short label max 40 chars","kcal":number,"p":number,"c":number,"f":number}`,
+        messages:[{role:'user',content:text}]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.find(b=>b.type==='text')?.text||'';
+    const meal = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    meal.time = new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'});
+    state.nutrition.meals.push(meal);
+    state.nutrition.totals.kcal += meal.kcal;
+    state.nutrition.totals.p += meal.p;
+    state.nutrition.totals.c += meal.c;
+    state.nutrition.totals.f += meal.f;
+    saveAll(); renderMeals();
+    setStatus('meal-status',''); input.value='';
+  } catch(e) { setStatus('meal-status','Error — try again','err'); }
+  input.disabled = false;
+}
+
+document.getElementById('meal-input').addEventListener('keydown', e => {
+  if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); logMeal(); }
+});
+
+// ─── GYM ─────────────────────────────────────────────────────
+function selectRoutine(key, btn) {
+  currentRoutine = key;
+  state.gym.routine = key;
+  document.querySelectorAll('.routine-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  gymExercises = ROUTINES[key].exercises.map(n=>({name:n,sets:'',reps:'',weight:''}));
+  renderExercises();
+}
+
+function renderExercises() {
+  document.getElementById('exercise-list').innerHTML = gymExercises.map((ex,i)=>`
+    <div class="exercise-item">
+      <div class="exercise-header">
+        <div class="exercise-name">${ex.name}</div>
+        <button class="exercise-remove" onclick="removeExercise(${i})">×</button>
+      </div>
+      <div class="exercise-inputs">
+        <div class="ex-field"><div class="ex-label">Sets</div><input class="ex-input" type="number" value="${ex.sets}" placeholder="3" oninput="updateEx(${i},'sets',this.value)"></div>
+        <div class="ex-field"><div class="ex-label">Reps</div><input class="ex-input" type="text" value="${ex.reps}" placeholder="5" oninput="updateEx(${i},'reps',this.value)"></div>
+        <div class="ex-field"><div class="ex-label">Weight</div><input class="ex-input" type="text" value="${ex.weight}" placeholder="kg" oninput="updateEx(${i},'weight',this.value)"></div>
+      </div>
+    </div>`).join('');
+}
+
+function updateEx(i,field,val) { gymExercises[i][field]=val; }
+function removeExercise(i) { gymExercises.splice(i,1); renderExercises(); }
+
+function addExercise() {
+  const input = document.getElementById('add-ex-input');
+  const name = input.value.trim();
+  if (!name) return;
+  gymExercises.push({name,sets:'',reps:'',weight:''});
+  input.value=''; renderExercises();
+}
+
+function saveGymSession() {
+  state.gym.exercises = gymExercises.filter(e=>e.sets||e.reps||e.weight);
+  state.gym.routine = currentRoutine;
+  state.gym.saved = true;
+  saveAll();
+  setStatus('gym-status','Session saved ✓');
+  setTimeout(()=>setStatus('gym-status',''),2000);
+}
+
+function renderGym() {
+  if (!gymExercises.length) {
+    gymExercises = ROUTINES[currentRoutine].exercises.map(n=>({name:n,sets:'',reps:'',weight:''}));
+    if (state.gym.exercises?.length && state.gym.routine===currentRoutine) {
+      state.gym.exercises.forEach(saved=>{
+        const idx = gymExercises.findIndex(e=>e.name===saved.name);
+        if (idx>=0) gymExercises[idx]=saved;
+      });
+    }
+  }
+  renderExercises();
+}
+
+// ─── ACTIVITY ─────────────────────────────────────────────────
+function selectActivity(type,btn) {
+  selectedActivity = type;
+  document.querySelectorAll('.activity-type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function logActivity() {
+  const dur = document.getElementById('activity-duration').value;
+  const notes = document.getElementById('activity-notes').value;
+  if (!dur) { setStatus('activity-status','Enter duration','err'); return; }
+  state.activities.push({ type:selectedActivity, duration:parseInt(dur), notes:notes.trim(), time:new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'}) });
+  saveAll(); renderActivities();
+  document.getElementById('activity-duration').value='';
+  document.getElementById('activity-notes').value='';
+  setStatus('activity-status','Logged ✓');
+  setTimeout(()=>setStatus('activity-status',''),2000);
+}
+
+function renderActivities() {
+  const list = document.getElementById('activity-list');
+  if (!state.activities.length) { list.innerHTML='<div class="empty-msg">No activities logged yet</div>'; return; }
+  list.innerHTML = state.activities.map(a=>`
+    <div class="activity-log-item">
+      <div><div class="act-name">${a.type}</div><div class="act-time">${a.time}${a.notes?' · '+a.notes:''}</div></div>
+      <div class="act-dur">${a.duration}m</div>
+    </div>`).join('');
+}
+
+// ─── SHEETS SYNC ─────────────────────────────────────────────
+async function syncToSheets() {
+  const url = settings.webhookUrl;
+  const btn = document.getElementById('sync-btn');
+  if (!url) { alert('Add your webhook URL in Settings first.'); return; }
+  btn.textContent='↑ Syncing…'; btn.className='sync-btn syncing';
+  try {
+    const payload = {
+      action: 'sync',
+      date: TODAY,
+      weight: state.vitals.weight,
+      steps: state.vitals.steps,
+      kcal: Math.round(state.nutrition.totals.kcal),
+      protein: fmt1(state.nutrition.totals.p),
+      carbs: fmt1(state.nutrition.totals.c),
+      fat: fmt1(state.nutrition.totals.f),
+      meals: state.nutrition.meals,
+      gym_routine: state.gym.saved ? ROUTINES[state.gym.routine]?.name : '',
+      gym_exercises: state.gym.exercises,
+      activities: state.activities
+    };
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    await fetch(url + '?data=' + encoded, { method:'GET', mode:'no-cors' });
+    btn.textContent='✓ Synced'; btn.className='sync-btn ok';
+    setTimeout(()=>{ btn.textContent='↑ Sync'; btn.className='sync-btn'; },2000);
+  } catch(e) {
+    btn.textContent='! Error'; btn.className='sync-btn error';
+    setTimeout(()=>{ btn.textContent='↑ Sync'; btn.className='sync-btn'; },2000);
+  }
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────
+function saveSettings() {
+  settings.webhookUrl = document.getElementById('webhook-url').value;
+  saveAll();
+}
+
+function resetDay() {
+  if (!confirm('Reset all of today\'s data?')) return;
+  state = { date:TODAY, vitals:{weight:'',steps:''}, nutrition:{meals:[],totals:{kcal:0,p:0,c:0,f:0}}, gym:{routine:'rdl',exercises:[],saved:false}, activities:[] };
+  gymExercises=[];
+  saveAll(); renderDash(); renderMeals(); renderActivities();
+}
+
+const APPS_SCRIPT = `function doGet(e) {
+  try {
+    var action = e.parameter.action || 'sync';
+    
+    if (action === 'trends') {
+      return getTrends();
+    }
+    
+    var raw = decodeURIComponent(e.parameter.data || '{}');
+    var data = JSON.parse(raw);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // NUTRITION
+    var ns = ss.getSheetByName('Nutrition') || ss.insertSheet('Nutrition');
+    if (ns.getLastRow() === 0) ns.appendRow(['Date','Weight (kg)','Steps','Kcal','Protein','Carbs','Fat']);
+    // Update existing row for today or append
+    var nData = ns.getDataRange().getValues();
+    var nRowIdx = -1;
+    for (var i = 1; i < nData.length; i++) {
+      if (nData[i][0] === data.date) { nRowIdx = i + 1; break; }
+    }
+    var nRow = [data.date, data.weight, data.steps, data.kcal, data.protein, data.carbs, data.fat];
+    if (nRowIdx > 0) ns.getRange(nRowIdx, 1, 1, 7).setValues([nRow]);
+    else ns.appendRow(nRow);
+
+    // MEALS
+    var ms = ss.getSheetByName('Meals') || ss.insertSheet('Meals');
+    if (ms.getLastRow() === 0) ms.appendRow(['Date','Time','Meal','Kcal','Protein','Carbs','Fat']);
+    // Remove old rows for today then re-append
+    var mData = ms.getDataRange().getValues();
+    for (var i = mData.length - 1; i >= 1; i--) {
+      if (mData[i][0] === data.date) ms.deleteRow(i + 1);
+    }
+    (data.meals || []).forEach(function(m) {
+      ms.appendRow([data.date, m.time, m.name, Math.round(m.kcal), m.p, m.c, m.f]);
+    });
+
+    // GYM
+    var gs = ss.getSheetByName('Gym') || ss.insertSheet('Gym');
+    if (gs.getLastRow() === 0) gs.appendRow(['Date','Routine','Exercise','Sets','Reps','Weight']);
+    var gData = gs.getDataRange().getValues();
+    for (var i = gData.length - 1; i >= 1; i--) {
+      if (gData[i][0] === data.date) gs.deleteRow(i + 1);
+    }
+    (data.gym_exercises || []).forEach(function(ex) {
+      gs.appendRow([data.date, data.gym_routine, ex.name, ex.sets, ex.reps, ex.weight]);
+    });
+
+    // ACTIVITIES
+    var as = ss.getSheetByName('Activities') || ss.insertSheet('Activities');
+    if (as.getLastRow() === 0) as.appendRow(['Date','Time','Type','Duration (min)','Notes']);
+    var aData = as.getDataRange().getValues();
+    for (var i = aData.length - 1; i >= 1; i--) {
+      if (aData[i][0] === data.date) as.deleteRow(i + 1);
+    }
+    (data.activities || []).forEach(function(a) {
+      as.appendRow([data.date, a.time, a.type, a.duration, a.notes]);
+    });
+
+    return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status:'error',message:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function getTrends() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ns = ss.getSheetByName('Nutrition');
+    var gs = ss.getSheetByName('Gym');
+    
+    // Get last 7 days
+    var dates = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      dates.push(d.toISOString().slice(0,10));
+    }
+    
+    var weight = [], kcal = [], protein = [];
+    if (ns && ns.getLastRow() > 1) {
+      var nData = ns.getDataRange().getValues();
+      var nMap = {};
+      for (var i = 1; i < nData.length; i++) {
+        nMap[nData[i][0]] = nData[i];
+      }
+      dates.forEach(function(d) {
+        var row = nMap[d];
+        weight.push(row ? parseFloat(row[1]) || null : null);
+        kcal.push(row ? parseFloat(row[3]) || 0 : 0);
+        protein.push(row ? parseFloat(row[4]) || 0 : 0);
+      });
+    } else {
+      dates.forEach(function() { weight.push(null); kcal.push(0); protein.push(0); });
+    }
+    
+    var gym = [];
+    if (gs && gs.getLastRow() > 1) {
+      var gData = gs.getDataRange().getValues();
+      var gSeen = {};
+      for (var i = 1; i < gData.length; i++) {
+        var d = gData[i][0];
+        if (dates.indexOf(d) >= 0 && !gSeen[d]) {
+          gSeen[d] = true;
+          var dp = d.split('-');
+          gym.push({ date_label: dp[1]+'/'+dp[2], routine: gData[i][1] });
+        }
+      }
+    }
+    
+    var result = { dates: dates, weight: weight, kcal: kcal, protein: protein, gym: gym };
+    return ContentService.createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+function copyScript() {
+  navigator.clipboard.writeText(APPS_SCRIPT).then(() => {
+    const btn = event.target;
+    btn.textContent='Copied ✓';
+    setTimeout(()=>btn.textContent='Copy script',2000);
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+loadAll();
+document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-HK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('webhook-url').value = settings.webhookUrl||'';
+document.getElementById('apps-script-code').textContent = APPS_SCRIPT;
+renderDash();
+renderMeals();
+renderActivities();
+</script>
+</body>
+</html>
