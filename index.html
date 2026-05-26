@@ -126,7 +126,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
       </div>
       <div class="vital-card">
         <div class="vital-label">Steps</div>
-        <input class="vital-input" id="steps-input" type="number" placeholder="&#8212;" oninput="saveVitals()">
+        <input class="vital-input" id="steps-input" type="text" inputmode="numeric" placeholder="&#8212;" oninput="saveVitals()">
       </div>
     </div>
     <div class="card">
@@ -323,7 +323,12 @@ function switchTab(tab,btn){
 }
 function saveVitals(){
   state.vitals.weight=document.getElementById('weight-input').value;
-  state.vitals.steps=document.getElementById('steps-input').value;
+  var rawSteps = document.getElementById('steps-input').value.replace(/,/g,'');
+  state.vitals.steps=rawSteps;
+  // Format with commas for display
+  if(rawSteps && !isNaN(rawSteps)){
+    document.getElementById('steps-input').value = parseInt(rawSteps).toLocaleString();
+  }
   saveAll();
 }
 function pct(v,max){return Math.min(100,Math.round((v/max)*100));}
@@ -409,7 +414,7 @@ function renderActivityStrip(ytdData){
 function renderDash(){
   renderMacros();
   document.getElementById('weight-input').value=state.vitals.weight||'';
-  document.getElementById('steps-input').value=state.vitals.steps||'';
+  var sv=state.vitals.steps||''; document.getElementById('steps-input').value=sv&&!isNaN(sv)?parseInt(sv).toLocaleString():sv;
   const gymEl=document.getElementById('dash-gym-summary');
   if(state.gym.saved&&state.gym.exercises.length){
     gymEl.innerHTML='<div class="card"><div class="card-title">Gym · '+(ROUTINES[state.gym.routine]&&ROUTINES[state.gym.routine].name||'')+'</div><div style="font-size:13px;color:var(--muted)">'+state.gym.exercises.length+' exercises completed</div></div>';
@@ -463,18 +468,18 @@ function renderTrends(data){
   const validW=data.weight.filter(Boolean);
   trendCharts.weight=new Chart(document.getElementById('chart-weight'),{
     type:'line',
-    data:{labels:labels,datasets:[{data:data.weight.map(function(v){return v||null;}),borderColor:'#1a1916',backgroundColor:'rgba(26,25,22,0.06)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#1a1916',fill:true,tension:0.3,spanGaps:true}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'},min:validW.length?Math.min.apply(null,validW)-1:60}}}
+    data:{labels:labels,datasets:[{data:data.weight.map(function(v){return v||null;}),borderColor:'#f0ede8',backgroundColor:'rgba(240,237,232,0.08)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#f0ede8',fill:true,tension:0.3,spanGaps:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10,family:'DM Mono'},color:'#6b6b65'}},y:{grid:{color:'rgba(255,255,255,0.08)'},ticks:{font:{size:10,family:'DM Mono'},color:'#6b6b65'},min:validW.length?Math.min.apply(null,validW)-1:60}}}
   });
   trendCharts.nutrition=new Chart(document.getElementById('chart-nutrition'),{
     type:'bar',
     data:{labels:labels,datasets:[
-      {label:'Kcal',data:data.kcal,backgroundColor:'rgba(26,25,22,0.15)',borderColor:'#1a1916',borderWidth:1,yAxisID:'y',order:2},
+      {label:'Kcal',data:data.kcal,backgroundColor:'rgba(240,237,232,0.15)',borderColor:'#f0ede8',borderWidth:1,yAxisID:'y',order:2},
       {label:'Protein',data:data.protein,borderColor:'#2563eb',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2563eb',type:'line',yAxisID:'y1',tension:0.3,order:1}
     ]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
-      x:{grid:{display:false},ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'}},
-      y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'},position:'left'},
+      x:{grid:{display:false},ticks:{font:{size:10,family:'DM Mono'},color:'#6b6b65'}},
+      y:{grid:{color:'rgba(255,255,255,0.08)'},ticks:{font:{size:10,family:'DM Mono'},color:'#6b6b65'},position:'left'},
       y1:{grid:{display:false},ticks:{font:{size:10,family:'DM Mono'},color:'#2563eb'},position:'right'}
     }}
   });
@@ -690,7 +695,7 @@ async function pullFromSheets(){
     renderMeals();
     renderActivities();
     document.getElementById('weight-input').value=state.vitals.weight||'';
-    document.getElementById('steps-input').value=state.vitals.steps||'';
+    var sv=state.vitals.steps||''; document.getElementById('steps-input').value=sv&&!isNaN(sv)?parseInt(sv).toLocaleString():sv;
     loadTrends();
     btn.textContent='✓ Pulled';btn.className='sync-btn ok';
     setTimeout(function(){btn.textContent='↓ Pull';btn.className='sync-btn';},2000);
