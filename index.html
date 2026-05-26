@@ -8,10 +8,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg:#f5f4f0;--surface:#fff;--surface2:#efefea;
-  --border:rgba(0,0,0,0.08);--border-med:rgba(0,0,0,0.14);
-  --text:#1a1916;--muted:#7a7870;
-  --accent-bg:#1a1916;--accent-text:#f5f4f0;
+  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#242424;
+  --border:rgba(255,255,255,0.08);--border-med:rgba(255,255,255,0.14);
+  --text:#e8e8e4;--muted:#6a6a66;
+  --accent-bg:#e8e8e4;--accent-text:#0f0f0f;
   --radius:12px;--radius-sm:8px;--tab-h:60px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -22,7 +22,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 .page-inner{padding:16px 16px 0;}
 .app-header{padding:20px 16px 0;display:flex;justify-content:space-between;align-items:flex-start;}
 .app-title{font-size:22px;font-weight:700;letter-spacing:-0.03em;}
-.app-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px;}
+.app-date{font-family:monospace;font-size:11px;color:var(--muted);margin-top:3px;}
 .hdr-btns{display:flex;gap:6px;}
 .sync-btn{background:var(--surface);border:0.5px solid var(--border-med);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;font-family:'Syne',sans-serif;cursor:pointer;color:var(--muted);}
 .sync-btn.syncing{color:#2563eb;}.sync-btn.ok{color:#2d6a4f;}.sync-btn.error{color:#991b1b;}
@@ -44,8 +44,8 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 .macro-bar-wrap{flex:1;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;}
 .macro-bar{height:100%;border-radius:4px;transition:width 0.4s ease;}
 .bar-kcal{background:var(--text);}.bar-protein{background:#2563eb;}.bar-carbs{background:#d97706;}.bar-fat{background:#db2777;}
-.macro-nums{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-align:right;width:72px;flex-shrink:0;}
-.macro-pct{font-family:'DM Mono',monospace;font-size:11px;font-weight:500;width:36px;text-align:right;flex-shrink:0;}
+.macro-nums{font-family:monospace;font-size:11px;color:var(--muted);text-align:right;width:72px;flex-shrink:0;}
+.macro-pct{font-family:monospace;font-size:11px;font-weight:500;width:36px;text-align:right;flex-shrink:0;}
 .kcal-big{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;}
 .kcal-num{font-size:42px;font-weight:700;letter-spacing:-0.04em;line-height:1;}
 .kcal-target{font-size:13px;color:var(--muted);text-align:right;}
@@ -54,7 +54,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 .btn:active{transform:scale(0.97);}
 .btn-primary{background:var(--accent-bg);color:var(--accent-text);border-color:var(--accent-bg);flex:1;}
 .btn-sm{padding:7px 12px;font-size:12px;}
-.status-line{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-height:16px;margin-bottom:6px;}
+.status-line{font-family:monospace;font-size:11px;color:var(--muted);min-height:16px;margin-bottom:6px;}
 .status-line.loading{color:#2563eb;}.status-line.err{color:#991b1b;}
 .meal-input{width:100%;border:0.5px solid var(--border-med);border-radius:var(--radius);padding:12px 14px;font-size:14px;font-family:'Syne',sans-serif;background:var(--surface);color:var(--text);resize:none;height:72px;outline:none;}
 .meal-input:focus{border-color:var(--text);}
@@ -62,10 +62,10 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 .meal-item{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 0;border-bottom:0.5px solid var(--border);gap:8px;}
 .meal-item:last-child{border-bottom:none;}
 .meal-item-name{font-size:13px;font-weight:500;flex:1;}
-.meal-item-time{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;}
+.meal-item-time{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px;}
 .meal-item-macros{text-align:right;flex-shrink:0;}
 .meal-item-kcal{font-size:14px;font-weight:700;}
-.meal-item-detail{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px;}
+.meal-item-detail{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px;}
 .empty-msg{text-align:center;padding:24px;color:var(--muted);font-size:13px;}
 .routine-picker{display:flex;gap:8px;margin-bottom:12px;}
 .routine-btn{flex:1;padding:10px 8px;border-radius:var(--radius-sm);border:0.5px solid var(--border-med);background:var(--surface);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer;text-align:center;color:var(--muted);}
@@ -78,7 +78,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 .exercise-inputs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
 .ex-field{display:flex;flex-direction:column;gap:3px;}
 .ex-label{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:0.06em;}
-.ex-input{border:0.5px solid var(--border-med);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:'DM Mono',monospace;font-weight:500;background:var(--surface2);color:var(--text);outline:none;width:100%;}
+.ex-input{border:0.5px solid var(--border-med);border-radius:var(--radius-sm);padding:8px 10px;font-size:14px;font-family:monospace;font-weight:500;background:var(--surface2);color:var(--text);outline:none;width:100%;}
 .ex-input:focus{border-color:var(--text);background:var(--surface);}
 .add-exercise{display:flex;gap:8px;margin-top:12px;}
 .add-exercise input{flex:1;border:0.5px solid var(--border-med);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;font-family:'Syne',sans-serif;background:var(--surface);color:var(--text);outline:none;}
@@ -88,17 +88,17 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 .activity-log-item{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:0.5px solid var(--border);}
 .activity-log-item:last-child{border-bottom:none;}
 .act-name{font-size:13px;font-weight:600;}.act-time{font-size:11px;color:var(--muted);}
-.act-dur{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;}
+.act-dur{font-family:monospace;font-size:14px;font-weight:500;}
 .section-sep{font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--muted);text-transform:uppercase;margin:16px 0 8px;}
 .settings-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:0.5px solid var(--border);}
 .settings-row:last-child{border-bottom:none;}
 .settings-label{font-size:13px;font-weight:500;}
 .settings-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-.settings-input{border:0.5px solid var(--border-med);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:'DM Mono',monospace;background:var(--surface2);color:var(--text);outline:none;width:100%;}
+.settings-input{border:0.5px solid var(--border-med);border-radius:var(--radius-sm);padding:8px 10px;font-size:13px;font-family:monospace;background:var(--surface2);color:var(--text);outline:none;width:100%;}
 .chart-wrap{position:relative;width:100%;height:140px;}
 .gym-pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600;margin:3px;}
 .gym-dot{width:8px;height:8px;border-radius:50%;background:var(--text);flex-shrink:0;}
-.trend-loading{text-align:center;padding:20px;color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;}
+.trend-loading{text-align:center;padding:20px;color:var(--muted);font-size:12px;font-family:monospace;}
 ::-webkit-scrollbar{width:0;}
 </style>
 </head>
@@ -107,7 +107,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 <div class="page active" id="page-dash">
   <div class="app-header">
     <div>
-      <div class="app-title">Good morning, Dex.</div>
+      <div class="app-title" id="greeting"></div>
       <div class="app-date" id="dash-date"></div>
     </div>
     <div class="hdr-btns">
@@ -138,7 +138,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
         <div class="kcal-target">
           <div class="kcal-remain" id="d-kcal-remain">1,764</div>
           <div>remaining</div>
-          <div style="margin-top:4px;font-family:'DM Mono',monospace;font-size:11px" id="d-kcal-pct">0% of target</div>
+          <div style="margin-top:4px;font-family:monospace;font-size:11px" id="d-kcal-pct">0% of target</div>
         </div>
       </div>
       <div class="macro-row"><div class="macro-name">Protein</div><div class="macro-bar-wrap"><div class="macro-bar bar-protein" id="d-bar-p" style="width:0%"></div></div><div class="macro-nums" id="d-p-nums">0 / 150g</div><div class="macro-pct" id="d-p-pct">0%</div></div>
@@ -149,6 +149,14 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
     <div id="trends-container"><div class="trend-loading">Fetching trends&#8230;</div></div>
     <div id="dash-gym-summary"></div>
     <div id="dash-activity-summary"></div>
+    <div class="section-sep">This week</div>
+    <div class="card" id="activity-week-card">
+      <div id="week-strip" style="display:flex;justify-content:space-between;margin-bottom:12px"></div>
+      <div id="ytd-counters" style="display:flex;flex-wrap:wrap;gap:6px">
+        <div style="font-size:11px;color:var(--muted);font-family:monospace">Loading year-to-date&#8230;</div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:monospace;margin-top:8px">Year to date from 26 May 2026</div>
+    </div>
   </div>
 </div>
 
@@ -203,37 +211,16 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
   </div>
 </div>
 
-<div class="page" id="page-gym">
-  <div class="page-inner">
-    <div class="section-sep">Select routine</div>
-    <div class="routine-picker">
-      <button class="routine-btn active" onclick="selectRoutine('rdl',this)">RDL</button>
-      <button class="routine-btn" onclick="selectRoutine('squat',this)">Squat</button>
-      <button class="routine-btn" onclick="selectRoutine('glute',this)">Glute Bridge</button>
-    </div>
-    <div class="section-sep">Exercises</div>
-    <div class="card" style="padding:8px 16px">
-      <div id="exercise-list"></div>
-      <div class="add-exercise">
-        <input type="text" id="add-ex-input" placeholder="Add exercise&#8230;" onkeydown="if(event.key==='Enter')addExercise()">
-        <button class="btn btn-sm" onclick="addExercise()">+ Add</button>
-      </div>
-    </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="saveGymSession()">Save session</button>
-    <div class="status-line" id="gym-status" style="margin-top:8px;text-align:center"></div>
-  </div>
-</div>
-
 <div class="page" id="page-activity">
   <div class="page-inner">
     <div class="section-sep">Activity type</div>
     <div class="activity-types">
-      <button class="activity-type-btn active" onclick="selectActivity('Tennis',this)">&#127934; Tennis</button>
-      <button class="activity-type-btn" onclick="selectActivity('Golf',this)">&#9971; Golf</button>
-      <button class="activity-type-btn" onclick="selectActivity('Walk',this)">&#128694; Walk</button>
-      <button class="activity-type-btn" onclick="selectActivity('Run',this)">&#127939; Run</button>
-      <button class="activity-type-btn" onclick="selectActivity('Swim',this)">&#127944; Swim</button>
-      <button class="activity-type-btn" onclick="selectActivity('Cycle',this)">&#128692; Cycle</button>
+      <button class="activity-type-btn active" onclick="selectActivity('Gym',this)">🏋️ Gym</button>
+      <button class="activity-type-btn" onclick="selectActivity('Golf',this)">⛳ Golf</button>
+      <button class="activity-type-btn" onclick="selectActivity('Tennis',this)">🎾 Tennis</button>
+      <button class="activity-type-btn" onclick="selectActivity('Hike',this)">🥾 Hike</button>
+      <button class="activity-type-btn" onclick="selectActivity('Soccer',this)">⚽ Soccer</button>
+      <button class="activity-type-btn" onclick="selectActivity('Swim',this)">🏊 Swim</button>
     </div>
     <div class="card">
       <div class="ex-field">
@@ -263,7 +250,7 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
     </div>
     <div class="section-sep">Apps Script code</div>
     <div class="card" style="background:var(--surface2)">
-      <pre id="apps-script-code" style="font-family:'DM Mono',monospace;font-size:10px;white-space:pre-wrap;color:var(--text);line-height:1.6"></pre>
+      <pre id="apps-script-code" style="font-family:monospace;font-size:10px;white-space:pre-wrap;color:var(--text);line-height:1.6"></pre>
       <button class="btn btn-sm" style="margin-top:10px;width:100%" onclick="copyScript()">Copy script</button>
     </div>
     <div class="section-sep">Setup guide</div>
@@ -290,7 +277,6 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 <nav class="tabs">
   <button class="tab active" onclick="switchTab('dash',this)"><span class="tab-icon">&#9672;</span><span>Today</span></button>
   <button class="tab" onclick="switchTab('nutrition',this)"><span class="tab-icon">&#8853;</span><span>Nutrition</span></button>
-  <button class="tab" onclick="switchTab('gym',this)"><span class="tab-icon">&#9678;</span><span>Gym</span></button>
   <button class="tab" onclick="switchTab('activity',this)"><span class="tab-icon">&#9677;</span><span>Activity</span></button>
   <button class="tab" onclick="switchTab('settings',this)"><span class="tab-icon">&#8862;</span><span>Settings</span></button>
 </nav>
@@ -306,7 +292,7 @@ const ROUTINES = {
 
 let state = {date:TODAY,vitals:{weight:'',steps:''},nutrition:{meals:[],totals:{kcal:0,p:0,c:0,f:0}},gym:{routine:'rdl',exercises:[],saved:false},activities:[]};
 let settings = {webhookUrl:''};
-let selectedActivity = 'Tennis';
+let selectedActivity = 'Gym';
 let currentRoutine = 'rdl';
 let gymExercises = [];
 let trendCharts = {};
@@ -369,6 +355,57 @@ function renderMacros(){
   document.getElementById('n-f-pct').textContent=pct(t.f,TARGETS.f)+'%';
 }
 
+function renderActivityStrip(ytdData){
+  // Week strip - last 7 days
+  const strip = document.getElementById('week-strip');
+  if(!strip) return;
+  const days = [];
+  for(var i=6;i>=0;i--){
+    var d=new Date();
+    d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const emojiMap = {'Gym':'\uD83C\uDFCB\uFE0F','Golf':'\u26F3','Tennis':'\uD83C\uDFBE','Hike':'\uD83D\uDC5E','Soccer':'\u26BD','Swim':'\uD83C\uDFCA'};
+  
+  // Build local activity map from today's state
+  var localMap = {};
+  state.activities.forEach(function(a){
+    if(!localMap[TODAY]) localMap[TODAY]=[];
+    localMap[TODAY].push(a.type);
+  });
+  
+  // Merge with ytd data for week
+  var weekMap = (ytdData && ytdData.week) ? ytdData.week : {};
+  Object.keys(localMap).forEach(function(d){ weekMap[d] = localMap[d]; });
+
+  strip.innerHTML = days.map(function(d){
+    var dow = new Date(d+'T12:00:00').getDay();
+    var acts = weekMap[d] || [];
+    var icons = acts.length ? acts.slice(0,2).map(function(a){return emojiMap[a]||'\u2022';}).join('') : '\u2013';
+    var isToday = d===TODAY;
+    return '<div style="flex:1;text-align:center">'
+      +'<div style="font-size:9px;font-family:monospace;color:var(--muted);margin-bottom:4px">'+dayNames[dow]+'</div>'
+      +'<div style="width:36px;height:36px;border-radius:50%;background:'+(isToday?'var(--accent-bg)':'var(--surface2)')+';display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:'+(acts.length?'14px':'16px')+';color:'+(isToday?'var(--accent-text)':'var(--text)')+'">'+icons+'</div>'
+      +'</div>';
+  }).join('');
+
+  // YTD counters
+  var ytdEl = document.getElementById('ytd-counters');
+  if(!ytdEl) return;
+  var counts = (ytdData && ytdData.counts) ? ytdData.counts : {};
+  var activities = ['Gym','Golf','Tennis','Hike','Soccer','Swim'];
+  var emojiMap2 = {'Gym':'\uD83C\uDFCB\uFE0F','Golf':'\u26F3','Tennis':'\uD83C\uDFBE','Hike':'\uD83D\uDC5E','Soccer':'\u26BD','Swim':'\uD83C\uDFCA'};
+  var html = activities.map(function(a){
+    var c = counts[a] || 0;
+    return '<div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border-radius:20px;padding:5px 10px;font-size:12px;font-weight:600">'
+      +'<span>'+emojiMap2[a]+'</span>'
+      +'<span style="font-family:monospace">'+c+'</span>'
+      +'</div>';
+  }).join('');
+  ytdEl.innerHTML = html;
+}
+
 function renderDash(){
   renderMacros();
   document.getElementById('weight-input').value=state.vitals.weight||'';
@@ -382,6 +419,19 @@ function renderDash(){
     actEl.innerHTML='<div class="card"><div class="card-title">Activities</div>'+state.activities.map(function(a){return '<div class="activity-log-item"><div><div class="act-name">'+a.type+'</div><div class="act-time">'+a.time+'</div></div><div class="act-dur">'+a.duration+'m</div></div>';}).join('')+'</div>';
   } else actEl.innerHTML='';
   loadTrends();
+  loadActivityData();
+}
+
+async function loadActivityData(){
+  const url = settings.webhookUrl;
+  if(!url){ renderActivityStrip(null); return; }
+  try{
+    const res = await fetch(url+'?action=activityStats');
+    const data = await res.json();
+    renderActivityStrip(data);
+  }catch(e){
+    renderActivityStrip(null);
+  }
 }
 
 async function loadTrends(){
@@ -667,6 +717,7 @@ const APPS_SCRIPT = `function doGet(e) {
     if (action === 'estimate') return estimateMeal(e.parameter.meal || '');
     if (action === 'trends') return getTrends();
     if (action === 'today') return getToday(e.parameter.date || '');
+    if (action === 'activityStats') return getActivityStats();
 
     var raw = decodeURIComponent(e.parameter.data || '{}');
     var data = JSON.parse(raw);
@@ -817,6 +868,46 @@ function getTrends() {
   }
 }
 
+function getActivityStats() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var as = ss.getSheetByName('Activities');
+    var START_DATE = '2026-05-26';
+    var today = new Date().toISOString().slice(0,10);
+    function toDateStr(val) {
+      if (!val) return '';
+      if (val instanceof Date) return val.toISOString().slice(0,10);
+      return String(val).slice(0,10);
+    }
+    // Last 7 days for week strip
+    var weekDates = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      weekDates.push(d.toISOString().slice(0,10));
+    }
+    var week = {};
+    var counts = {Gym:0,Golf:0,Tennis:0,Hike:0,Soccer:0,Swim:0};
+    if (as && as.getLastRow() > 1) {
+      var aData = as.getDataRange().getValues();
+      for (var i = 1; i < aData.length; i++) {
+        var d = toDateStr(aData[i][0]);
+        var type = String(aData[i][2]);
+        if (d >= START_DATE && d <= today) {
+          if (counts[type] !== undefined) counts[type]++;
+          if (weekDates.indexOf(d) >= 0) {
+            if (!week[d]) week[d] = [];
+            week[d].push(type);
+          }
+        }
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({week:week,counts:counts})).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
 function getToday(date) {
   try {
     if (!date) return ContentService.createTextOutput(JSON.stringify({error:'No date'})).setMimeType(ContentService.MimeType.JSON);
@@ -908,6 +999,18 @@ loadAll();
   }
 })();
 
+var _hour = new Date().getHours();
+var _greeting = _hour < 12 ? 'Good morning' : _hour < 17 ? 'Good afternoon' : 'Good evening';
+document.querySelector('.app-title').textContent = _greeting + ', Dex.';
+var hour = new Date().getHours();
+var greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+document.querySelector('.app-title').textContent = greeting + ', Dex.';
+var _h = new Date().getHours();
+var _greet = _h < 12 ? 'Good morning' : _h < 17 ? 'Good afternoon' : 'Good evening';
+document.getElementById('greeting').textContent = _greet + ', Dex.';
+var _h = new Date().getHours();
+var _greet = _h < 12 ? 'Good morning' : _h < 17 ? 'Good afternoon' : 'Good evening';
+document.getElementById('greeting').textContent = _greet + ', Dex.';
 document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-HK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 document.getElementById('webhook-url').value=settings.webhookUrl||'';
 document.getElementById('apps-script-code').textContent=APPS_SCRIPT;
