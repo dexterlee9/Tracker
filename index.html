@@ -473,7 +473,7 @@ async function logMeal() {
   setStatus('meal-status','Estimating macros…','loading');
   input.disabled = true;
   try {
-    const res = await fetch(url + '?action=estimate&meal=' + encodeURIComponent(text), { mode:'cors' });
+    const res = await fetch(url + '?action=estimate&meal=' + encodeURIComponent(text));
     const meal = await res.json();
     if (meal.error) throw new Error(meal.error);
     meal.time = new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'});
