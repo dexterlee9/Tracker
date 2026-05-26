@@ -549,6 +549,7 @@ async function pullFromSheets(){
   try{
     const res=await fetch(url+'?action=today&date='+TODAY);
     const data=await res.json();
+    console.log('PULL DATA:', JSON.stringify(data));
     if(data.error) throw new Error(data.error);
     if(data.vitals) state.vitals=data.vitals;
     if(data.meals){
