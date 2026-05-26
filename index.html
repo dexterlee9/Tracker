@@ -155,9 +155,43 @@ body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:r
 <div class="page" id="page-nutrition">
   <div class="page-inner">
     <div class="section-sep">Log a meal</div>
-    <textarea class="meal-input" id="meal-input" placeholder="e.g. 150g chicken breast, 200g white rice&#8230;"></textarea>
-    <div class="status-line" id="meal-status"></div>
-    <div class="log-actions"><button class="btn btn-primary" onclick="logMeal()">Estimate &amp; log &#8599;</button></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="routine-btn active" id="mode-ai" onclick="setLogMode('ai')">AI estimate</button>
+      <button class="routine-btn" id="mode-manual" onclick="setLogMode('manual')">Manual entry</button>
+    </div>
+    <div id="log-ai">
+      <textarea class="meal-input" id="meal-input" placeholder="e.g. 150g chicken breast, 200g white rice&#8230;"></textarea>
+      <div class="status-line" id="meal-status"></div>
+      <div class="log-actions"><button class="btn btn-primary" onclick="logMeal()">Estimate &amp; log &#8599;</button></div>
+    </div>
+    <div id="log-manual" style="display:none">
+      <div class="card" style="padding:12px 14px">
+        <div class="ex-field" style="margin-bottom:10px">
+          <div class="ex-label">Meal name</div>
+          <input class="ex-input" id="manual-name" type="text" placeholder="e.g. Lunch bowl" style="width:100%;margin-top:4px;font-family:'Syne',sans-serif;font-size:13px">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div class="ex-field">
+            <div class="ex-label">Calories</div>
+            <input class="ex-input" id="manual-kcal" type="number" placeholder="737">
+          </div>
+          <div class="ex-field">
+            <div class="ex-label">Protein (g)</div>
+            <input class="ex-input" id="manual-p" type="number" placeholder="79.8">
+          </div>
+          <div class="ex-field">
+            <div class="ex-label">Carbs (g)</div>
+            <input class="ex-input" id="manual-c" type="number" placeholder="72.9">
+          </div>
+          <div class="ex-field">
+            <div class="ex-label">Fat (g)</div>
+            <input class="ex-input" id="manual-f" type="number" placeholder="12.8">
+          </div>
+        </div>
+        <div class="status-line" id="manual-status"></div>
+        <button class="btn btn-primary" style="width:100%" onclick="logManual()">Log meal</button>
+      </div>
+    </div>
     <div class="card" style="margin-top:10px">
       <div class="macro-row"><div class="macro-name" style="font-size:11px;color:var(--muted)">Kcal</div><div class="macro-bar-wrap"><div class="macro-bar bar-kcal" id="n-bar-k" style="width:0%"></div></div><div class="macro-nums" id="n-k-nums">0 / 1764</div><div class="macro-pct" id="n-k-pct">0%</div></div>
       <div class="macro-row"><div class="macro-name" style="font-size:11px;color:var(--muted)">Protein</div><div class="macro-bar-wrap"><div class="macro-bar bar-protein" id="n-bar-p" style="width:0%"></div></div><div class="macro-nums" id="n-p-nums">0 / 150g</div><div class="macro-pct" id="n-p-pct">0%</div></div>
@@ -406,15 +440,57 @@ function renderMeals(){
   renderMacros();
   const list=document.getElementById('meal-list');
   if(!state.nutrition.meals.length){list.innerHTML='<div class="empty-msg">No meals logged yet</div>';return;}
-  list.innerHTML=state.nutrition.meals.map(function(m){
-    return '<div class="meal-item"><div><div class="meal-item-name">'+m.name+'</div><div class="meal-item-time">'+m.time+'</div></div><div class="meal-item-macros"><div class="meal-item-kcal">'+Math.round(m.kcal)+' kcal</div><div class="meal-item-detail">P'+fmt1(m.p)+' · C'+fmt1(m.c)+' · F'+fmt1(m.f)+'</div></div></div>';
+  list.innerHTML=state.nutrition.meals.map(function(m,i){
+    return '<div class="meal-item"><div style="flex:1"><div class="meal-item-name">'+m.name+'</div><div class="meal-item-time">'+m.time+'</div></div><div class="meal-item-macros"><div class="meal-item-kcal">'+Math.round(m.kcal)+' kcal</div><div class="meal-item-detail">P'+fmt1(m.p)+' · C'+fmt1(m.c)+' · F'+fmt1(m.f)+'</div></div><button onclick="deleteMeal('+i+')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0 0 0 8px;line-height:1;flex-shrink:0">×</button></div>';
   }).join('');
+}
+
+function deleteMeal(i){
+  const m = state.nutrition.meals[i];
+  state.nutrition.totals.kcal -= m.kcal;
+  state.nutrition.totals.p -= m.p;
+  state.nutrition.totals.c -= m.c;
+  state.nutrition.totals.f -= m.f;
+  state.nutrition.meals.splice(i,1);
+  saveAll();renderMeals();
 }
 
 function setStatus(id,msg,type){
   const el=document.getElementById(id);
   el.textContent=msg;
   el.className='status-line'+(type?' '+type:'');
+}
+
+function setLogMode(mode){
+  document.getElementById('log-ai').style.display = mode==='ai' ? 'block' : 'none';
+  document.getElementById('log-manual').style.display = mode==='manual' ? 'block' : 'none';
+  document.getElementById('mode-ai').classList.toggle('active', mode==='ai');
+  document.getElementById('mode-manual').classList.toggle('active', mode==='manual');
+}
+
+function logManual(){
+  const name = document.getElementById('manual-name').value.trim();
+  const kcal = parseFloat(document.getElementById('manual-kcal').value);
+  const p = parseFloat(document.getElementById('manual-p').value);
+  const c = parseFloat(document.getElementById('manual-c').value);
+  const f = parseFloat(document.getElementById('manual-f').value);
+  if(!name || isNaN(kcal) || isNaN(p) || isNaN(c) || isNaN(f)){
+    setStatus('manual-status','Fill in all fields','err');
+    return;
+  }
+  const meal = {name:name, kcal:kcal, p:p, c:c, f:f, time:new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'})};
+  state.nutrition.meals.push(meal);
+  state.nutrition.totals.kcal+=meal.kcal;
+  state.nutrition.totals.p+=meal.p;
+  state.nutrition.totals.c+=meal.c;
+  state.nutrition.totals.f+=meal.f;
+  saveAll();renderMeals();
+  setStatus('manual-status','');
+  document.getElementById('manual-name').value='';
+  document.getElementById('manual-kcal').value='';
+  document.getElementById('manual-p').value='';
+  document.getElementById('manual-c').value='';
+  document.getElementById('manual-f').value='';
 }
 
 async function logMeal(){
@@ -610,9 +686,15 @@ const APPS_SCRIPT = `function doGet(e) {
     for (var i = 1; i < nData.length; i++) {
       if (toDateStr(nData[i][0]) === data.date) { nRowIdx = i + 1; break; }
     }
-    var nRow = [data.date, data.weight, data.steps, data.kcal, data.protein, data.carbs, data.fat];
-    if (nRowIdx > 0) ns.getRange(nRowIdx, 1, 1, 7).setValues([nRow]);
-    else ns.appendRow(nRow);
+    var dateStr = String(data.date);
+    var nRow = [dateStr, data.weight, data.steps, data.kcal, data.protein, data.carbs, data.fat];
+    if (nRowIdx > 0) {
+      ns.getRange(nRowIdx, 1, 1, 7).setValues([nRow]);
+      ns.getRange(nRowIdx, 1).setNumberFormat('@');
+    } else {
+      ns.appendRow(nRow);
+      ns.getRange(ns.getLastRow(), 1).setNumberFormat('@');
+    }
 
     var ms = ss.getSheetByName('Meals') || ss.insertSheet('Meals');
     ms.getRange('A:A').setNumberFormat('@');
@@ -622,7 +704,9 @@ const APPS_SCRIPT = `function doGet(e) {
       if (toDateStr(mData[i][0]) === data.date) ms.deleteRow(i + 1);
     }
     (data.meals || []).forEach(function(m) {
-      ms.appendRow([data.date, m.time, m.name, Math.round(m.kcal), m.p, m.c, m.f]);
+      ms.appendRow([String(data.date), m.time, m.name, Math.round(m.kcal), m.p, m.c, m.f]);
+      ms.getRange(ms.getLastRow(), 1).setNumberFormat('@');
+      ms.getRange(ms.getLastRow(), 2).setNumberFormat('@');
     });
 
     var gs = ss.getSheetByName('Gym') || ss.insertSheet('Gym');
@@ -633,7 +717,8 @@ const APPS_SCRIPT = `function doGet(e) {
       if (toDateStr(gData[i][0]) === data.date) gs.deleteRow(i + 1);
     }
     (data.gym_exercises || []).forEach(function(ex) {
-      gs.appendRow([data.date, data.gym_routine, ex.name, ex.sets, ex.reps, ex.weight]);
+      gs.appendRow([String(data.date), data.gym_routine, ex.name, ex.sets, ex.reps, ex.weight]);
+      gs.getRange(gs.getLastRow(), 1).setNumberFormat('@');
     });
 
     var as = ss.getSheetByName('Activities') || ss.insertSheet('Activities');
@@ -644,7 +729,9 @@ const APPS_SCRIPT = `function doGet(e) {
       if (toDateStr(aData[i][0]) === data.date) as.deleteRow(i + 1);
     }
     (data.activities || []).forEach(function(a) {
-      as.appendRow([data.date, a.time, a.type, a.duration, a.notes]);
+      as.appendRow([String(data.date), a.time, a.type, a.duration, a.notes]);
+      as.getRange(as.getLastRow(), 1).setNumberFormat('@');
+      as.getRange(as.getLastRow(), 2).setNumberFormat('@');
     });
 
     return ContentService.createTextOutput(JSON.stringify({status:'ok'})).setMimeType(ContentService.MimeType.JSON);
@@ -660,7 +747,8 @@ function estimateMeal(mealText) {
     var payload = {
       model: 'claude-sonnet-4-20250514',
       max_tokens: 200,
-      system: 'You are a nutrition assistant. Return ONLY a valid JSON object with no markdown, no backticks, no explanation. Format exactly: {"name":"short label max 40 chars","kcal":number,"p":number,"c":number,"f":number}',
+      temperature: 0,
+      system: 'You are a precise nutrition calculator. Use these exact per-100g values: cooked white rice 130kcal/2.4p/28.6c/0.2f, raw chicken breast 165kcal/31p/0c/3.6f, 90% lean minced beef 145kcal/20p/0c/7f, non-fat cottage cheese 80kcal/14.5p/4.2c/0.5f, lettuce 14kcal/1.4p/2.9c/0.2f, broccoli 35kcal/2.4p/7.2c/0.4f, tomato 18kcal/0.9p/3.9c/0.2f, sweet potato 86kcal/1.6p/20c/0.1f, egg white 52kcal/11p/0.7c/0.2f, salmon 208kcal/20p/0c/13f, oats 389kcal/17p/66c/7f, Greek yogurt non-fat 59kcal/10p/3.6c/0.4f, whey protein per 30g scoop 120kcal/24p/3c/1.5f, blueberries 57kcal/0.7p/14.5c/0.3f. For any food not listed, use standard USDA values. Calculate macros precisely based on the exact weights given. Return ONLY a valid JSON object: {"name":"short label max 40 chars","kcal":number,"p":number,"c":number,"f":number}. No markdown, no backticks, no explanation.',
       messages: [{role: 'user', content: mealText}]
     };
     var options = {
@@ -754,7 +842,13 @@ function getToday(date) {
       var mData = ms.getDataRange().getValues();
       for (var i = 1; i < mData.length; i++) {
         if (toDateStr(mData[i][0]) === date) {
-          result.meals.push({time:String(mData[i][1]),name:String(mData[i][2]),kcal:parseFloat(mData[i][3])||0,p:parseFloat(mData[i][4])||0,c:parseFloat(mData[i][5])||0,f:parseFloat(mData[i][6])||0});
+          var mTime = mData[i][1];
+          if (mTime instanceof Date) {
+            mTime = Utilities.formatDate(mTime, Session.getScriptTimeZone(), 'HH:mm');
+          } else {
+            mTime = String(mTime);
+          }
+          result.meals.push({time:mTime,name:String(mData[i][2]),kcal:parseFloat(mData[i][3])||0,p:parseFloat(mData[i][4])||0,c:parseFloat(mData[i][5])||0,f:parseFloat(mData[i][6])||0});
         }
       }
     }
@@ -763,7 +857,13 @@ function getToday(date) {
       var aData = as.getDataRange().getValues();
       for (var i = 1; i < aData.length; i++) {
         if (toDateStr(aData[i][0]) === date) {
-          result.activities.push({time:String(aData[i][1]),type:String(aData[i][2]),duration:parseInt(aData[i][3])||0,notes:String(aData[i][4])});
+          var aTime = aData[i][1];
+          if (aTime instanceof Date) {
+            aTime = Utilities.formatDate(aTime, Session.getScriptTimeZone(), 'HH:mm');
+          } else {
+            aTime = String(aTime);
+          }
+          result.activities.push({time:aTime,type:String(aData[i][2]),duration:parseInt(aData[i][3])||0,notes:String(aData[i][4])});
         }
       }
     }
