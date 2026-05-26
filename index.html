@@ -298,6 +298,8 @@ function switchTab(tab,btn){
   btn.classList.add('active');
   if(tab==='gym') renderGym();
   if(tab==='dash') renderDash();
+  if(tab==='nutrition') renderMeals();
+  if(tab==='activity') renderActivities();
 }
 function saveVitals(){
   state.vitals.weight=document.getElementById('weight-input').value;
@@ -556,7 +558,13 @@ async function pullFromSheets(){
     }
     if(data.activities) state.activities=data.activities;
     if(data.gym) state.gym=data.gym;
-    saveAll();renderDash();renderMeals();renderActivities();
+    saveAll();
+    renderMacros();
+    renderMeals();
+    renderActivities();
+    document.getElementById('weight-input').value=state.vitals.weight||'';
+    document.getElementById('steps-input').value=state.vitals.steps||'';
+    loadTrends();
     btn.textContent='✓ Pulled';btn.className='sync-btn ok';
     setTimeout(function(){btn.textContent='↓ Pull';btn.className='sync-btn';},2000);
   }catch(e){
