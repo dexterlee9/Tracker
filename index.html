@@ -603,6 +603,7 @@ const APPS_SCRIPT = `function doGet(e) {
     }
 
     var ns = ss.getSheetByName('Nutrition') || ss.insertSheet('Nutrition');
+    ns.getRange('A:A').setNumberFormat('@');
     if (ns.getLastRow() === 0) ns.appendRow(['Date','Weight (kg)','Steps','Kcal','Protein','Carbs','Fat']);
     var nData = ns.getDataRange().getValues();
     var nRowIdx = -1;
@@ -614,6 +615,7 @@ const APPS_SCRIPT = `function doGet(e) {
     else ns.appendRow(nRow);
 
     var ms = ss.getSheetByName('Meals') || ss.insertSheet('Meals');
+    ms.getRange('A:A').setNumberFormat('@');
     if (ms.getLastRow() === 0) ms.appendRow(['Date','Time','Meal','Kcal','Protein','Carbs','Fat']);
     var mData = ms.getDataRange().getValues();
     for (var i = mData.length - 1; i >= 1; i--) {
@@ -624,6 +626,7 @@ const APPS_SCRIPT = `function doGet(e) {
     });
 
     var gs = ss.getSheetByName('Gym') || ss.insertSheet('Gym');
+    gs.getRange('A:A').setNumberFormat('@');
     if (gs.getLastRow() === 0) gs.appendRow(['Date','Routine','Exercise','Sets','Reps','Weight']);
     var gData = gs.getDataRange().getValues();
     for (var i = gData.length - 1; i >= 1; i--) {
@@ -634,6 +637,7 @@ const APPS_SCRIPT = `function doGet(e) {
     });
 
     var as = ss.getSheetByName('Activities') || ss.insertSheet('Activities');
+    as.getRange('A:A').setNumberFormat('@');
     if (as.getLastRow() === 0) as.appendRow(['Date','Time','Type','Duration (min)','Notes']);
     var aData = as.getDataRange().getValues();
     for (var i = aData.length - 1; i >= 1; i--) {
