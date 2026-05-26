@@ -8,18 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --bg: #f5f4f0;
-  --surface: #ffffff;
-  --surface2: #efefea;
-  --border: rgba(0,0,0,0.08);
-  --border-med: rgba(0,0,0,0.14);
-  --text: #1a1916;
-  --muted: #7a7870;
-  --accent-bg: #1a1916;
-  --accent-text: #f5f4f0;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --tab-h: 60px;
+  --bg: #f5f4f0; --surface: #ffffff; --surface2: #efefea;
+  --border: rgba(0,0,0,0.08); --border-med: rgba(0,0,0,0.14);
+  --text: #1a1916; --muted: #7a7870;
+  --accent-bg: #1a1916; --accent-text: #f5f4f0;
+  --radius: 12px; --radius-sm: 8px; --tab-h: 60px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overflow: hidden; }
@@ -30,12 +23,10 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 .app-header { padding: 20px 16px 0; display: flex; justify-content: space-between; align-items: flex-start; }
 .app-title { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; }
 .app-date { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-top: 3px; }
-.sync-btn { background: var(--surface); border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px; font-family: 'Syne', sans-serif; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-.sync-btn.syncing { color: #2563eb; }
-.sync-btn.ok { color: #2d6a4f; }
-.sync-btn.error { color: #991b1b; }
+.sync-btn { background: var(--surface); border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 12px; font-family: 'Syne', sans-serif; cursor: pointer; color: var(--muted); }
+.sync-btn.syncing { color: #2563eb; } .sync-btn.ok { color: #2d6a4f; } .sync-btn.error { color: #991b1b; }
 .tabs { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; height: var(--tab-h); z-index: 100; }
-.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; font-size: 10px; font-family: 'Syne', sans-serif; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; transition: color 0.15s; border: none; background: none; padding-bottom: 4px; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; font-size: 10px; font-family: 'Syne', sans-serif; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; border: none; background: none; padding-bottom: 4px; }
 .tab.active { color: var(--text); }
 .tab-icon { font-size: 20px; line-height: 1; }
 .card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 14px 16px; margin-bottom: 10px; }
@@ -51,10 +42,7 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 .macro-name { font-size: 12px; font-weight: 500; width: 60px; flex-shrink: 0; }
 .macro-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
 .macro-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-.bar-kcal { background: var(--text); }
-.bar-protein { background: #2563eb; }
-.bar-carbs { background: #d97706; }
-.bar-fat { background: #db2777; }
+.bar-kcal { background: var(--text); } .bar-protein { background: #2563eb; } .bar-carbs { background: #d97706; } .bar-fat { background: #db2777; }
 .macro-nums { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-align: right; width: 72px; flex-shrink: 0; }
 .macro-pct { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; width: 36px; text-align: right; flex-shrink: 0; }
 .kcal-big { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; }
@@ -66,8 +54,7 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 .btn-primary { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-bg); flex: 1; }
 .btn-sm { padding: 7px 12px; font-size: 12px; }
 .status-line { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); min-height: 16px; margin-bottom: 6px; }
-.status-line.loading { color: #2563eb; }
-.status-line.err { color: #991b1b; }
+.status-line.loading { color: #2563eb; } .status-line.err { color: #991b1b; }
 .meal-input { width: 100%; border: 0.5px solid var(--border-med); border-radius: var(--radius); padding: 12px 14px; font-size: 14px; font-family: 'Syne', sans-serif; background: var(--surface); color: var(--text); resize: none; height: 72px; outline: none; }
 .meal-input:focus { border-color: var(--text); }
 .log-actions { display: flex; gap: 8px; margin-top: 8px; }
@@ -80,7 +67,7 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 .meal-item-detail { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
 .empty-msg { text-align: center; padding: 24px; color: var(--muted); font-size: 13px; }
 .routine-picker { display: flex; gap: 8px; margin-bottom: 12px; }
-.routine-btn { flex: 1; padding: 10px 8px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-med); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); transition: all 0.15s; }
+.routine-btn { flex: 1; padding: 10px 8px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-med); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); }
 .routine-btn.active { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-bg); }
 .exercise-item { padding: 12px 0; border-bottom: 0.5px solid var(--border); }
 .exercise-item:last-child { border-bottom: none; }
@@ -95,12 +82,11 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 .add-exercise { display: flex; gap: 8px; margin-top: 12px; }
 .add-exercise input { flex: 1; border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; font-family: 'Syne', sans-serif; background: var(--surface); color: var(--text); outline: none; }
 .activity-types { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-.activity-type-btn { padding: 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-med); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); transition: all 0.15s; }
+.activity-type-btn { padding: 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-med); background: var(--surface); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; color: var(--muted); }
 .activity-type-btn.active { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-bg); }
 .activity-log-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 0.5px solid var(--border); }
 .activity-log-item:last-child { border-bottom: none; }
-.act-name { font-size: 13px; font-weight: 600; }
-.act-time { font-size: 11px; color: var(--muted); }
+.act-name { font-size: 13px; font-weight: 600; } .act-time { font-size: 11px; color: var(--muted); }
 .act-dur { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; }
 .section-sep { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin: 16px 0 8px; }
 .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
@@ -108,15 +94,10 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 .settings-label { font-size: 13px; font-weight: 500; }
 .settings-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 .settings-input { border: 0.5px solid var(--border-med); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 13px; font-family: 'DM Mono', monospace; background: var(--surface2); color: var(--text); outline: none; width: 100%; }
-
-/* TREND CHARTS */
-.trend-section { margin-bottom: 10px; }
-.trend-loading { text-align: center; padding: 20px; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
 .chart-wrap { position: relative; width: 100%; height: 140px; }
-.gym-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border-radius: 20px; padding: 5px 10px; font-size: 12px; font-weight: 600; margin: 3px 3px 3px 0; }
+.gym-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--surface2); border-radius: 20px; padding: 5px 10px; font-size: 12px; font-weight: 600; margin: 3px; }
 .gym-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text); flex-shrink: 0; }
-.gym-grid { display: flex; flex-wrap: wrap; }
-
+.trend-loading { text-align: center; padding: 20px; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
 ::-webkit-scrollbar { width: 0; }
 </style>
 </head>
@@ -145,7 +126,6 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
         <input class="vital-input" id="steps-input" type="number" placeholder="—" oninput="saveVitals()">
       </div>
     </div>
-
     <div class="card">
       <div class="kcal-big">
         <div>
@@ -177,13 +157,8 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
         <div class="macro-pct" id="d-f-pct">0%</div>
       </div>
     </div>
-
-    <!-- TRENDS -->
     <div class="section-sep">7-day trends</div>
-    <div id="trends-container">
-      <div class="trend-loading" id="trends-loading">Fetching trends…</div>
-    </div>
-
+    <div id="trends-container"><div class="trend-loading" id="trends-loading">Fetching trends…</div></div>
     <div id="dash-gym-summary"></div>
     <div id="dash-activity-summary"></div>
   </div>
@@ -304,9 +279,9 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
         <li>Create a new Google Sheet</li>
         <li>Go to <b style="color:var(--text)">Extensions → Apps Script</b></li>
         <li>Paste the Apps Script code above</li>
-        <li>Click <b style="color:var(--text)">Deploy → New deployment → Web app</b></li>
-        <li>Set access to <b style="color:var(--text)">"Anyone"</b>, copy the URL</li>
-        <li>Paste URL above and tap Sync on dashboard</li>
+        <li>Replace <b style="color:var(--text)">PASTE_YOUR_ANTHROPIC_API_KEY_HERE</b> with your key from console.anthropic.com</li>
+        <li>Deploy as Web app, access: Anyone</li>
+        <li>Paste URL above and tap Sync</li>
       </ol>
     </div>
     <div class="section-sep">Data</div>
@@ -323,30 +298,19 @@ body { display: flex; flex-direction: column; max-width: 430px; margin: 0 auto; 
 </div>
 
 <nav class="tabs">
-  <button class="tab active" onclick="switchTab('dash',this)">
-    <span class="tab-icon">◈</span><span>Today</span>
-  </button>
-  <button class="tab" onclick="switchTab('nutrition',this)">
-    <span class="tab-icon">⊕</span><span>Nutrition</span>
-  </button>
-  <button class="tab" onclick="switchTab('gym',this)">
-    <span class="tab-icon">◎</span><span>Gym</span>
-  </button>
-  <button class="tab" onclick="switchTab('activity',this)">
-    <span class="tab-icon">◉</span><span>Activity</span>
-  </button>
-  <button class="tab" onclick="switchTab('settings',this)">
-    <span class="tab-icon">⊞</span><span>Settings</span>
-  </button>
+  <button class="tab active" onclick="switchTab('dash',this)"><span class="tab-icon">◈</span><span>Today</span></button>
+  <button class="tab" onclick="switchTab('nutrition',this)"><span class="tab-icon">⊕</span><span>Nutrition</span></button>
+  <button class="tab" onclick="switchTab('gym',this)"><span class="tab-icon">◎</span><span>Gym</span></button>
+  <button class="tab" onclick="switchTab('activity',this)"><span class="tab-icon">◉</span><span>Activity</span></button>
+  <button class="tab" onclick="switchTab('settings',this)"><span class="tab-icon">⊞</span><span>Settings</span></button>
 </nav>
 
 <script>
-const TARGETS = { kcal: 1764, p: 150, c: 150, f: 63 };
+const TARGETS = { kcal:1764, p:150, c:150, f:63 };
 const TODAY = new Date().toISOString().slice(0,10);
-
 const ROUTINES = {
-  rdl: { name:'RDL', exercises:['Romanian Deadlift','Weighted Neutral Grip Pull Up','Barbell Reverse Lunge','Dumbbell Decline Bench Press','High to Low Cable Row','Seated Leg Extension','Cable Face Pull','Cable Bent Over Overhead Tricep Extension'] },
-  squat: { name:'Squat', exercises:['Back Squat','Dual Dumbbell Modified Seal Row','Clavicular Cable Pec Fly','Dumbbell Incline Bench Press','Cable Rear Delt Fly','Farmers Walk','Cable Lateral Delt Raise (Back Facing)'] },
+  rdl:   { name:'RDL',         exercises:['Romanian Deadlift','Weighted Neutral Grip Pull Up','Barbell Reverse Lunge','Dumbbell Decline Bench Press','High to Low Cable Row','Seated Leg Extension','Cable Face Pull','Cable Bent Over Overhead Tricep Extension'] },
+  squat: { name:'Squat',       exercises:['Back Squat','Dual Dumbbell Modified Seal Row','Clavicular Cable Pec Fly','Dumbbell Incline Bench Press','Cable Rear Delt Fly','Farmers Walk','Cable Lateral Delt Raise (Back Facing)'] },
   glute: { name:'Glute Bridge', exercises:['Leg Press','Landmine Bent Over Rope Row','Dumbbell Flat Bench Press','Kas Glute Bridge','Dual Dumbbell Seated Press','Dumbbell Bicep Curl','Cable Bent Over Overhead Tricep Extension','Hamstring Curl on Machine','Cable Kneeling Crunch'] }
 };
 
@@ -365,14 +329,12 @@ function loadAll() {
     if (cfg) settings = JSON.parse(cfg);
   } catch(e) {}
 }
-
 function saveAll() {
   try {
     localStorage.setItem('dx_tracker_' + TODAY, JSON.stringify(state));
     localStorage.setItem('dx_settings', JSON.stringify(settings));
   } catch(e) {}
 }
-
 function switchTab(tab, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -381,13 +343,11 @@ function switchTab(tab, btn) {
   if (tab === 'gym') renderGym();
   if (tab === 'dash') renderDash();
 }
-
 function saveVitals() {
   state.vitals.weight = document.getElementById('weight-input').value;
   state.vitals.steps = document.getElementById('steps-input').value;
   saveAll();
 }
-
 function pct(v, max) { return Math.min(100, Math.round((v/max)*100)); }
 function fmt1(v) { return parseFloat(v||0).toFixed(1); }
 
@@ -398,10 +358,10 @@ function renderMacros() {
   document.getElementById('d-kcal-pct').textContent = pct(t.kcal, TARGETS.kcal) + '% of target';
   [['d-bar-p','d-p-nums','d-p-pct',t.p,TARGETS.p,'g'],
    ['d-bar-c','d-c-nums','d-c-pct',t.c,TARGETS.c,'g'],
-   ['d-bar-f','d-f-nums','d-f-pct',t.f,TARGETS.f,'g']].forEach(([bar,nums,pctEl,val,max,unit]) => {
-    document.getElementById(bar).style.width = pct(val,max) + '%';
-    document.getElementById(nums).textContent = fmt1(val) + ' / ' + max + unit;
-    document.getElementById(pctEl).textContent = pct(val,max) + '%';
+   ['d-bar-f','d-f-nums','d-f-pct',t.f,TARGETS.f,'g']].forEach(function(x) {
+    document.getElementById(x[0]).style.width = pct(x[3],x[4]) + '%';
+    document.getElementById(x[1]).textContent = fmt1(x[3]) + ' / ' + x[4] + x[5];
+    document.getElementById(x[2]).textContent = pct(x[3],x[4]) + '%';
   });
   document.getElementById('n-bar-k').style.width = pct(t.kcal,TARGETS.kcal)+'%';
   document.getElementById('n-k-nums').textContent = Math.round(t.kcal)+' / 1764';
@@ -423,26 +383,21 @@ function renderDash() {
   document.getElementById('steps-input').value = state.vitals.steps || '';
   const gymEl = document.getElementById('dash-gym-summary');
   if (state.gym.saved && state.gym.exercises.length) {
-    gymEl.innerHTML = `<div class="card"><div class="card-title">Gym · ${ROUTINES[state.gym.routine]?.name||''}</div><div style="font-size:13px;color:var(--muted)">${state.gym.exercises.length} exercises completed</div></div>`;
+    gymEl.innerHTML = '<div class="card"><div class="card-title">Gym · ' + (ROUTINES[state.gym.routine]&&ROUTINES[state.gym.routine].name||'') + '</div><div style="font-size:13px;color:var(--muted)">' + state.gym.exercises.length + ' exercises completed</div></div>';
   } else gymEl.innerHTML = '';
   const actEl = document.getElementById('dash-activity-summary');
   if (state.activities.length) {
-    actEl.innerHTML = `<div class="card"><div class="card-title">Activities</div>${state.activities.map(a=>`<div class="activity-log-item"><div><div class="act-name">${a.type}</div><div class="act-time">${a.time}</div></div><div class="act-dur">${a.duration}m</div></div>`).join('')}</div>`;
+    actEl.innerHTML = '<div class="card"><div class="card-title">Activities</div>' + state.activities.map(function(a) { return '<div class="activity-log-item"><div><div class="act-name">'+a.type+'</div><div class="act-time">'+a.time+'</div></div><div class="act-dur">'+a.duration+'m</div></div>'; }).join('') + '</div>';
   } else actEl.innerHTML = '';
   loadTrends();
 }
 
-// ─── TRENDS ──────────────────────────────────────────────────
 async function loadTrends() {
   const url = settings.webhookUrl;
   const container = document.getElementById('trends-container');
-  if (!url) {
-    container.innerHTML = '<div class="trend-loading">Add webhook URL in Settings to see trends</div>';
-    return;
-  }
-  document.getElementById('trends-loading').style.display = 'block';
+  if (!url) { container.innerHTML = '<div class="trend-loading">Add webhook URL in Settings to see trends</div>'; return; }
   try {
-    const res = await fetch(url + '?action=trends', { mode: 'cors' });
+    const res = await fetch(url + '?action=trends', { mode:'cors' });
     const data = await res.json();
     renderTrends(data);
   } catch(e) {
@@ -452,141 +407,55 @@ async function loadTrends() {
 
 function renderTrends(data) {
   const container = document.getElementById('trends-container');
-  if (!data || !data.weight || data.weight.length === 0) {
+  if (!data || !data.dates || data.dates.length === 0) {
     container.innerHTML = '<div class="trend-loading">No trend data yet — sync a few days to see trends</div>';
     return;
   }
-
-  const labels = data.dates.map(d => {
-    const parts = d.split('-');
-    return parts[1]+'/'+parts[2];
-  });
-
-  // Destroy old charts
-  Object.values(trendCharts).forEach(c => c.destroy());
+  const labels = data.dates.map(function(d) { var p=d.split('-'); return p[1]+'/'+p[2]; });
+  Object.values(trendCharts).forEach(function(c) { c.destroy(); });
   trendCharts = {};
+  container.innerHTML =
+    '<div class="card" style="margin-bottom:10px"><div class="card-title">Morning weight (kg)</div><div class="chart-wrap"><canvas id="chart-weight" role="img" aria-label="7 day morning weight"></canvas></div></div>' +
+    '<div class="card" style="margin-bottom:10px"><div class="card-title">Calories & protein</div><div class="chart-wrap"><canvas id="chart-nutrition" role="img" aria-label="7 day calories and protein"></canvas></div><div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--muted)"><span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1a1916;display:inline-block"></span>Kcal</span><span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:#2563eb;display:inline-block"></span>Protein (g)</span></div></div>' +
+    '<div class="card" style="margin-bottom:10px"><div class="card-title">Gym sessions</div><div id="gym-trend-grid"></div></div>';
 
-  container.innerHTML = `
-    <div class="card trend-section">
-      <div class="card-title">Morning weight (kg)</div>
-      <div class="chart-wrap"><canvas id="chart-weight" role="img" aria-label="7 day morning weight trend"></canvas></div>
-    </div>
-    <div class="card trend-section">
-      <div class="card-title">Calories & protein</div>
-      <div class="chart-wrap"><canvas id="chart-nutrition" role="img" aria-label="7 day calorie and protein trend"></canvas></div>
-    </div>
-    <div class="card trend-section">
-      <div class="card-title">Gym sessions</div>
-      <div class="gym-grid" id="gym-trend-grid"></div>
-    </div>
-  `;
-
-  const chartDefaults = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' } },
-      y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' } }
-    }
+  const baseScales = {
+    x: { grid:{display:false}, ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'} },
+    y: { grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'} }
   };
-
-  // Weight chart
+  const validW = data.weight.filter(Boolean);
   trendCharts.weight = new Chart(document.getElementById('chart-weight'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        data: data.weight.map(v => v || null),
-        borderColor: '#1a1916',
-        backgroundColor: 'rgba(26,25,22,0.06)',
-        borderWidth: 2,
-        pointRadius: 4,
-        pointBackgroundColor: '#1a1916',
-        fill: true,
-        tension: 0.3,
-        spanGaps: true
-      }]
-    },
-    options: { ...chartDefaults, scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, min: data.weight.filter(Boolean).length ? Math.min(...data.weight.filter(Boolean)) - 1 : 60 } } }
+    type:'line',
+    data:{ labels:labels, datasets:[{ data:data.weight.map(function(v){return v||null;}), borderColor:'#1a1916', backgroundColor:'rgba(26,25,22,0.06)', borderWidth:2, pointRadius:4, pointBackgroundColor:'#1a1916', fill:true, tension:0.3, spanGaps:true }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:baseScales.x, y:Object.assign({},baseScales.y,{min:validW.length?Math.min.apply(null,validW)-1:60}) } }
   });
-
-  // Nutrition chart
   trendCharts.nutrition = new Chart(document.getElementById('chart-nutrition'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Kcal',
-          data: data.kcal,
-          backgroundColor: 'rgba(26,25,22,0.15)',
-          borderColor: '#1a1916',
-          borderWidth: 1,
-          yAxisID: 'y',
-          order: 2
-        },
-        {
-          label: 'Protein',
-          data: data.protein,
-          borderColor: '#2563eb',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 4,
-          pointBackgroundColor: '#2563eb',
-          type: 'line',
-          yAxisID: 'y1',
-          tension: 0.3,
-          order: 1
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' } },
-        y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#7a7870' }, position: 'left' },
-        y1: { grid: { display: false }, ticks: { font: { size: 10, family: 'DM Mono' }, color: '#2563eb' }, position: 'right' }
-      }
-    }
+    type:'bar',
+    data:{ labels:labels, datasets:[
+      { label:'Kcal', data:data.kcal, backgroundColor:'rgba(26,25,22,0.15)', borderColor:'#1a1916', borderWidth:1, yAxisID:'y', order:2 },
+      { label:'Protein', data:data.protein, borderColor:'#2563eb', backgroundColor:'transparent', borderWidth:2, pointRadius:4, pointBackgroundColor:'#2563eb', type:'line', yAxisID:'y1', tension:0.3, order:1 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{
+      x:baseScales.x,
+      y:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{font:{size:10,family:'DM Mono'},color:'#7a7870'}, position:'left' },
+      y1:{ grid:{display:false}, ticks:{font:{size:10,family:'DM Mono'},color:'#2563eb'}, position:'right' }
+    }}
   });
-
-  // Gym pills
   const gymGrid = document.getElementById('gym-trend-grid');
   if (data.gym && data.gym.length) {
-    gymGrid.innerHTML = data.gym.map(g => `
-      <div class="gym-pill">
-        <div class="gym-dot"></div>
-        <span>${g.date_label} · ${g.routine}</span>
-      </div>`).join('');
+    gymGrid.innerHTML = data.gym.map(function(g) { return '<div class="gym-pill"><div class="gym-dot"></div><span>'+g.date_label+' · '+g.routine+'</span></div>'; }).join('');
   } else {
     gymGrid.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px 0">No gym sessions logged yet</div>';
   }
-
-  // Legend for nutrition chart
-  const legendHtml = `
-    <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--muted)">
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1a1916;display:inline-block"></span>Kcal</span>
-      <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:#2563eb;display:inline-block"></span>Protein (g)</span>
-    </div>`;
-  document.getElementById('chart-nutrition').closest('.card').insertAdjacentHTML('beforeend', legendHtml);
 }
 
-// ─── MEAL LOGGING ─────────────────────────────────────────────
 function renderMeals() {
   renderMacros();
   const list = document.getElementById('meal-list');
   if (!state.nutrition.meals.length) { list.innerHTML = '<div class="empty-msg">No meals logged yet</div>'; return; }
-  list.innerHTML = state.nutrition.meals.map(m => `
-    <div class="meal-item">
-      <div><div class="meal-item-name">${m.name}</div><div class="meal-item-time">${m.time}</div></div>
-      <div class="meal-item-macros">
-        <div class="meal-item-kcal">${Math.round(m.kcal)} kcal</div>
-        <div class="meal-item-detail">P${fmt1(m.p)} · C${fmt1(m.c)} · F${fmt1(m.f)}</div>
-      </div>
-    </div>`).join('');
+  list.innerHTML = state.nutrition.meals.map(function(m) {
+    return '<div class="meal-item"><div><div class="meal-item-name">'+m.name+'</div><div class="meal-item-time">'+m.time+'</div></div><div class="meal-item-macros"><div class="meal-item-kcal">'+Math.round(m.kcal)+' kcal</div><div class="meal-item-detail">P'+fmt1(m.p)+' · C'+fmt1(m.c)+' · F'+fmt1(m.f)+'</div></div></div>';
+  }).join('');
 }
 
 function setStatus(id, msg, type) {
@@ -599,21 +468,14 @@ async function logMeal() {
   const input = document.getElementById('meal-input');
   const text = input.value.trim();
   if (!text) return;
+  const url = settings.webhookUrl;
+  if (!url) { setStatus('meal-status','Add webhook URL in Settings first','err'); return; }
   setStatus('meal-status','Estimating macros…','loading');
   input.disabled = true;
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514', max_tokens:200,
-        system:`You are a nutrition assistant. Return ONLY a JSON object, no markdown, no backticks.
-Format: {"name":"short label max 40 chars","kcal":number,"p":number,"c":number,"f":number}`,
-        messages:[{role:'user',content:text}]
-      })
-    });
-    const data = await res.json();
-    const raw = data.content?.find(b=>b.type==='text')?.text||'';
-    const meal = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const res = await fetch(url + '?action=estimate&meal=' + encodeURIComponent(text), { mode:'cors' });
+    const meal = await res.json();
+    if (meal.error) throw new Error(meal.error);
     meal.time = new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'});
     state.nutrition.meals.push(meal);
     state.nutrition.totals.kcal += meal.kcal;
@@ -626,98 +488,74 @@ Format: {"name":"short label max 40 chars","kcal":number,"p":number,"c":number,"
   input.disabled = false;
 }
 
-document.getElementById('meal-input').addEventListener('keydown', e => {
+document.getElementById('meal-input').addEventListener('keydown', function(e) {
   if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); logMeal(); }
 });
 
-// ─── GYM ─────────────────────────────────────────────────────
 function selectRoutine(key, btn) {
-  currentRoutine = key;
-  state.gym.routine = key;
-  document.querySelectorAll('.routine-btn').forEach(b=>b.classList.remove('active'));
+  currentRoutine = key; state.gym.routine = key;
+  document.querySelectorAll('.routine-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
-  gymExercises = ROUTINES[key].exercises.map(n=>({name:n,sets:'',reps:'',weight:''}));
+  gymExercises = ROUTINES[key].exercises.map(function(n){return {name:n,sets:'',reps:'',weight:''};});
   renderExercises();
 }
-
 function renderExercises() {
-  document.getElementById('exercise-list').innerHTML = gymExercises.map((ex,i)=>`
-    <div class="exercise-item">
-      <div class="exercise-header">
-        <div class="exercise-name">${ex.name}</div>
-        <button class="exercise-remove" onclick="removeExercise(${i})">×</button>
-      </div>
-      <div class="exercise-inputs">
-        <div class="ex-field"><div class="ex-label">Sets</div><input class="ex-input" type="number" value="${ex.sets}" placeholder="3" oninput="updateEx(${i},'sets',this.value)"></div>
-        <div class="ex-field"><div class="ex-label">Reps</div><input class="ex-input" type="text" value="${ex.reps}" placeholder="5" oninput="updateEx(${i},'reps',this.value)"></div>
-        <div class="ex-field"><div class="ex-label">Weight</div><input class="ex-input" type="text" value="${ex.weight}" placeholder="kg" oninput="updateEx(${i},'weight',this.value)"></div>
-      </div>
-    </div>`).join('');
+  document.getElementById('exercise-list').innerHTML = gymExercises.map(function(ex,i) {
+    return '<div class="exercise-item"><div class="exercise-header"><div class="exercise-name">'+ex.name+'</div><button class="exercise-remove" onclick="removeExercise('+i+')">×</button></div><div class="exercise-inputs"><div class="ex-field"><div class="ex-label">Sets</div><input class="ex-input" type="number" value="'+ex.sets+'" placeholder="3" oninput="updateEx('+i+',\'sets\',this.value)"></div><div class="ex-field"><div class="ex-label">Reps</div><input class="ex-input" type="text" value="'+ex.reps+'" placeholder="5" oninput="updateEx('+i+',\'reps\',this.value)"></div><div class="ex-field"><div class="ex-label">Weight</div><input class="ex-input" type="text" value="'+ex.weight+'" placeholder="kg" oninput="updateEx('+i+',\'weight\',this.value)"></div></div></div>';
+  }).join('');
 }
-
 function updateEx(i,field,val) { gymExercises[i][field]=val; }
 function removeExercise(i) { gymExercises.splice(i,1); renderExercises(); }
-
 function addExercise() {
   const input = document.getElementById('add-ex-input');
   const name = input.value.trim();
   if (!name) return;
-  gymExercises.push({name,sets:'',reps:'',weight:''});
+  gymExercises.push({name:name,sets:'',reps:'',weight:''});
   input.value=''; renderExercises();
 }
-
 function saveGymSession() {
-  state.gym.exercises = gymExercises.filter(e=>e.sets||e.reps||e.weight);
-  state.gym.routine = currentRoutine;
-  state.gym.saved = true;
+  state.gym.exercises = gymExercises.filter(function(e){return e.sets||e.reps||e.weight;});
+  state.gym.routine = currentRoutine; state.gym.saved = true;
   saveAll();
   setStatus('gym-status','Session saved ✓');
-  setTimeout(()=>setStatus('gym-status',''),2000);
+  setTimeout(function(){setStatus('gym-status','');},2000);
 }
-
 function renderGym() {
   if (!gymExercises.length) {
-    gymExercises = ROUTINES[currentRoutine].exercises.map(n=>({name:n,sets:'',reps:'',weight:''}));
-    if (state.gym.exercises?.length && state.gym.routine===currentRoutine) {
-      state.gym.exercises.forEach(saved=>{
-        const idx = gymExercises.findIndex(e=>e.name===saved.name);
+    gymExercises = ROUTINES[currentRoutine].exercises.map(function(n){return {name:n,sets:'',reps:'',weight:''};});
+    if (state.gym.exercises&&state.gym.exercises.length&&state.gym.routine===currentRoutine) {
+      state.gym.exercises.forEach(function(saved){
+        const idx=gymExercises.findIndex(function(e){return e.name===saved.name;});
         if (idx>=0) gymExercises[idx]=saved;
       });
     }
   }
   renderExercises();
 }
-
-// ─── ACTIVITY ─────────────────────────────────────────────────
 function selectActivity(type,btn) {
-  selectedActivity = type;
-  document.querySelectorAll('.activity-type-btn').forEach(b=>b.classList.remove('active'));
+  selectedActivity=type;
+  document.querySelectorAll('.activity-type-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');
 }
-
 function logActivity() {
   const dur = document.getElementById('activity-duration').value;
   const notes = document.getElementById('activity-notes').value;
   if (!dur) { setStatus('activity-status','Enter duration','err'); return; }
-  state.activities.push({ type:selectedActivity, duration:parseInt(dur), notes:notes.trim(), time:new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'}) });
+  state.activities.push({type:selectedActivity,duration:parseInt(dur),notes:notes.trim(),time:new Date().toLocaleTimeString('en-HK',{hour:'2-digit',minute:'2-digit'})});
   saveAll(); renderActivities();
   document.getElementById('activity-duration').value='';
   document.getElementById('activity-notes').value='';
   setStatus('activity-status','Logged ✓');
-  setTimeout(()=>setStatus('activity-status',''),2000);
+  setTimeout(function(){setStatus('activity-status','');},2000);
 }
-
 function renderActivities() {
   const list = document.getElementById('activity-list');
   if (!state.activities.length) { list.innerHTML='<div class="empty-msg">No activities logged yet</div>'; return; }
-  list.innerHTML = state.activities.map(a=>`
-    <div class="activity-log-item">
-      <div><div class="act-name">${a.type}</div><div class="act-time">${a.time}${a.notes?' · '+a.notes:''}</div></div>
-      <div class="act-dur">${a.duration}m</div>
-    </div>`).join('');
+  list.innerHTML = state.activities.map(function(a){
+    return '<div class="activity-log-item"><div><div class="act-name">'+a.type+'</div><div class="act-time">'+a.time+(a.notes?' · '+a.notes:'')+'</div></div><div class="act-dur">'+a.duration+'m</div></div>';
+  }).join('');
 }
 
-// ─── SHEETS SYNC ─────────────────────────────────────────────
 async function syncToSheets() {
   const url = settings.webhookUrl;
   const btn = document.getElementById('sync-btn');
@@ -725,38 +563,33 @@ async function syncToSheets() {
   btn.textContent='↑ Syncing…'; btn.className='sync-btn syncing';
   try {
     const payload = {
-      action: 'sync',
-      date: TODAY,
-      weight: state.vitals.weight,
-      steps: state.vitals.steps,
-      kcal: Math.round(state.nutrition.totals.kcal),
-      protein: fmt1(state.nutrition.totals.p),
-      carbs: fmt1(state.nutrition.totals.c),
-      fat: fmt1(state.nutrition.totals.f),
-      meals: state.nutrition.meals,
-      gym_routine: state.gym.saved ? ROUTINES[state.gym.routine]?.name : '',
-      gym_exercises: state.gym.exercises,
-      activities: state.activities
+      action:'sync', date:TODAY,
+      weight:state.vitals.weight, steps:state.vitals.steps,
+      kcal:Math.round(state.nutrition.totals.kcal),
+      protein:fmt1(state.nutrition.totals.p),
+      carbs:fmt1(state.nutrition.totals.c),
+      fat:fmt1(state.nutrition.totals.f),
+      meals:state.nutrition.meals,
+      gym_routine:state.gym.saved?(ROUTINES[state.gym.routine]&&ROUTINES[state.gym.routine].name)||'':'',
+      gym_exercises:state.gym.exercises,
+      activities:state.activities
     };
-    const encoded = encodeURIComponent(JSON.stringify(payload));
-    await fetch(url + '?data=' + encoded, { method:'GET', mode:'no-cors' });
+    await fetch(url + '?data=' + encodeURIComponent(JSON.stringify(payload)), {method:'GET',mode:'no-cors'});
     btn.textContent='✓ Synced'; btn.className='sync-btn ok';
-    setTimeout(()=>{ btn.textContent='↑ Sync'; btn.className='sync-btn'; },2000);
+    setTimeout(function(){btn.textContent='↑ Sync';btn.className='sync-btn';},2000);
   } catch(e) {
     btn.textContent='! Error'; btn.className='sync-btn error';
-    setTimeout(()=>{ btn.textContent='↑ Sync'; btn.className='sync-btn'; },2000);
+    setTimeout(function(){btn.textContent='↑ Sync';btn.className='sync-btn';},2000);
   }
 }
 
-// ─── SETTINGS ────────────────────────────────────────────────
 function saveSettings() {
   settings.webhookUrl = document.getElementById('webhook-url').value;
   saveAll();
 }
-
 function resetDay() {
   if (!confirm('Reset all of today\'s data?')) return;
-  state = { date:TODAY, vitals:{weight:'',steps:''}, nutrition:{meals:[],totals:{kcal:0,p:0,c:0,f:0}}, gym:{routine:'rdl',exercises:[],saved:false}, activities:[] };
+  state={date:TODAY,vitals:{weight:'',steps:''},nutrition:{meals:[],totals:{kcal:0,p:0,c:0,f:0}},gym:{routine:'rdl',exercises:[],saved:false},activities:[]};
   gymExercises=[];
   saveAll(); renderDash(); renderMeals(); renderActivities();
 }
@@ -764,26 +597,27 @@ function resetDay() {
 const APPS_SCRIPT = `function doGet(e) {
   try {
     var action = e.parameter.action || 'sync';
-    
+
+    if (action === 'estimate') {
+      return estimateMeal(e.parameter.meal || '');
+    }
+
     if (action === 'trends') {
       return getTrends();
     }
-    
+
     var raw = decodeURIComponent(e.parameter.data || '{}');
     var data = JSON.parse(raw);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    // NUTRITION
-    var ns = ss.getSheetByName('Nutrition') || ss.insertSheet('Nutrition');
-    if (ns.getLastRow() === 0) ns.appendRow(['Date','Weight (kg)','Steps','Kcal','Protein','Carbs','Fat']);
-    // Helper to normalise cell value to YYYY-MM-DD string
     function toDateStr(val) {
       if (!val) return '';
       if (val instanceof Date) return val.toISOString().slice(0,10);
       return String(val).slice(0,10);
     }
 
-    // NUTRITION — update existing row or append
+    var ns = ss.getSheetByName('Nutrition') || ss.insertSheet('Nutrition');
+    if (ns.getLastRow() === 0) ns.appendRow(['Date','Weight (kg)','Steps','Kcal','Protein','Carbs','Fat']);
     var nData = ns.getDataRange().getValues();
     var nRowIdx = -1;
     for (var i = 1; i < nData.length; i++) {
@@ -793,7 +627,6 @@ const APPS_SCRIPT = `function doGet(e) {
     if (nRowIdx > 0) ns.getRange(nRowIdx, 1, 1, 7).setValues([nRow]);
     else ns.appendRow(nRow);
 
-    // MEALS — delete today's rows then re-append
     var ms = ss.getSheetByName('Meals') || ss.insertSheet('Meals');
     if (ms.getLastRow() === 0) ms.appendRow(['Date','Time','Meal','Kcal','Protein','Carbs','Fat']);
     var mData = ms.getDataRange().getValues();
@@ -804,7 +637,6 @@ const APPS_SCRIPT = `function doGet(e) {
       ms.appendRow([data.date, m.time, m.name, Math.round(m.kcal), m.p, m.c, m.f]);
     });
 
-    // GYM — delete today's rows then re-append
     var gs = ss.getSheetByName('Gym') || ss.insertSheet('Gym');
     if (gs.getLastRow() === 0) gs.appendRow(['Date','Routine','Exercise','Sets','Reps','Weight']);
     var gData = gs.getDataRange().getValues();
@@ -815,7 +647,6 @@ const APPS_SCRIPT = `function doGet(e) {
       gs.appendRow([data.date, data.gym_routine, ex.name, ex.sets, ex.reps, ex.weight]);
     });
 
-    // ACTIVITIES — delete today's rows then re-append
     var as = ss.getSheetByName('Activities') || ss.insertSheet('Activities');
     if (as.getLastRow() === 0) as.appendRow(['Date','Time','Type','Duration (min)','Notes']);
     var aData = as.getDataRange().getValues();
@@ -826,11 +657,41 @@ const APPS_SCRIPT = `function doGet(e) {
       as.appendRow([data.date, a.time, a.type, a.duration, a.notes]);
     });
 
-    return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({status:'ok'})).setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({status:'error',message:err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({status:'error',message:err.toString()})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function estimateMeal(mealText) {
+  try {
+    if (!mealText) {
+      return ContentService.createTextOutput(JSON.stringify({error:'No meal provided'})).setMimeType(ContentService.MimeType.JSON);
+    }
+    var apiKey = 'PASTE_YOUR_ANTHROPIC_API_KEY_HERE';
+    var payload = {
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 200,
+      system: 'You are a nutrition assistant. Return ONLY a valid JSON object with no markdown, no backticks, no explanation. Format exactly: {"name":"short label max 40 chars","kcal":number,"p":number,"c":number,"f":number}',
+      messages: [{ role: 'user', content: mealText }]
+    };
+    var options = {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      muteHttpExceptions: true
+    };
+    var response = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', options);
+    var data = JSON.parse(response.getContentText());
+    var text = data.content[0].text.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    var meal = JSON.parse(text);
+    return ContentService.createTextOutput(JSON.stringify(meal)).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
@@ -839,39 +700,39 @@ function getTrends() {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var ns = ss.getSheetByName('Nutrition');
     var gs = ss.getSheetByName('Gym');
-    
-    // Get last 7 days
     var dates = [];
     for (var i = 6; i >= 0; i--) {
       var d = new Date();
       d.setDate(d.getDate() - i);
       dates.push(d.toISOString().slice(0,10));
     }
-    
+    function toDateStr(val) {
+      if (!val) return '';
+      if (val instanceof Date) return val.toISOString().slice(0,10);
+      return String(val).slice(0,10);
+    }
     var weight = [], kcal = [], protein = [];
     if (ns && ns.getLastRow() > 1) {
       var nData = ns.getDataRange().getValues();
       var nMap = {};
       for (var i = 1; i < nData.length; i++) {
-        var dk = nData[i][0] instanceof Date ? nData[i][0].toISOString().slice(0,10) : String(nData[i][0]).slice(0,10);
-        nMap[dk] = nData[i];
+        nMap[toDateStr(nData[i][0])] = nData[i];
       }
       dates.forEach(function(d) {
         var row = nMap[d];
-        weight.push(row ? parseFloat(row[1]) || null : null);
-        kcal.push(row ? parseFloat(row[3]) || 0 : 0);
-        protein.push(row ? parseFloat(row[4]) || 0 : 0);
+        weight.push(row ? (parseFloat(row[1]) || null) : null);
+        kcal.push(row ? (parseFloat(row[3]) || 0) : 0);
+        protein.push(row ? (parseFloat(row[4]) || 0) : 0);
       });
     } else {
       dates.forEach(function() { weight.push(null); kcal.push(0); protein.push(0); });
     }
-    
     var gym = [];
     if (gs && gs.getLastRow() > 1) {
       var gData = gs.getDataRange().getValues();
       var gSeen = {};
       for (var i = 1; i < gData.length; i++) {
-        var d = gData[i][0] instanceof Date ? gData[i][0].toISOString().slice(0,10) : String(gData[i][0]).slice(0,10);
+        var d = toDateStr(gData[i][0]);
         if (dates.indexOf(d) >= 0 && !gSeen[d]) {
           gSeen[d] = true;
           var dp = d.split('-');
@@ -879,25 +740,20 @@ function getTrends() {
         }
       }
     }
-    
-    var result = { dates: dates, weight: weight, kcal: kcal, protein: protein, gym: gym };
-    return ContentService.createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({dates:dates,weight:weight,kcal:kcal,protein:protein,gym:gym})).setMimeType(ContentService.MimeType.JSON);
   } catch(err) {
-    return ContentService.createTextOutput(JSON.stringify({error:err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({error:err.toString()})).setMimeType(ContentService.MimeType.JSON);
   }
 }`;
 
 function copyScript() {
-  navigator.clipboard.writeText(APPS_SCRIPT).then(() => {
-    const btn = event.target;
+  navigator.clipboard.writeText(APPS_SCRIPT).then(function() {
+    var btn = event.target;
     btn.textContent='Copied ✓';
-    setTimeout(()=>btn.textContent='Copy script',2000);
+    setTimeout(function(){btn.textContent='Copy script';},2000);
   });
 }
 
-// ─── INIT ─────────────────────────────────────────────────────
 loadAll();
 document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-HK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 document.getElementById('webhook-url').value = settings.webhookUrl||'';
