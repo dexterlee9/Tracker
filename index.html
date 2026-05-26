@@ -776,45 +776,51 @@ const APPS_SCRIPT = `function doGet(e) {
     // NUTRITION
     var ns = ss.getSheetByName('Nutrition') || ss.insertSheet('Nutrition');
     if (ns.getLastRow() === 0) ns.appendRow(['Date','Weight (kg)','Steps','Kcal','Protein','Carbs','Fat']);
-    // Update existing row for today or append
+    // Helper to normalise cell value to YYYY-MM-DD string
+    function toDateStr(val) {
+      if (!val) return '';
+      if (val instanceof Date) return val.toISOString().slice(0,10);
+      return String(val).slice(0,10);
+    }
+
+    // NUTRITION — update existing row or append
     var nData = ns.getDataRange().getValues();
     var nRowIdx = -1;
     for (var i = 1; i < nData.length; i++) {
-      if (nData[i][0] === data.date) { nRowIdx = i + 1; break; }
+      if (toDateStr(nData[i][0]) === data.date) { nRowIdx = i + 1; break; }
     }
     var nRow = [data.date, data.weight, data.steps, data.kcal, data.protein, data.carbs, data.fat];
     if (nRowIdx > 0) ns.getRange(nRowIdx, 1, 1, 7).setValues([nRow]);
     else ns.appendRow(nRow);
 
-    // MEALS
+    // MEALS — delete today's rows then re-append
     var ms = ss.getSheetByName('Meals') || ss.insertSheet('Meals');
     if (ms.getLastRow() === 0) ms.appendRow(['Date','Time','Meal','Kcal','Protein','Carbs','Fat']);
-    // Remove old rows for today then re-append
     var mData = ms.getDataRange().getValues();
     for (var i = mData.length - 1; i >= 1; i--) {
-      if (mData[i][0] === data.date) ms.deleteRow(i + 1);
+      if (toDateStr(mData[i][0]) === data.date) ms.deleteRow(i + 1);
     }
     (data.meals || []).forEach(function(m) {
       ms.appendRow([data.date, m.time, m.name, Math.round(m.kcal), m.p, m.c, m.f]);
     });
 
-    // GYM
+    // GYM — delete today's rows then re-append
     var gs = ss.getSheetByName('Gym') || ss.insertSheet('Gym');
     if (gs.getLastRow() === 0) gs.appendRow(['Date','Routine','Exercise','Sets','Reps','Weight']);
     var gData = gs.getDataRange().getValues();
     for (var i = gData.length - 1; i >= 1; i--) {
-      if (gData[i][0] === data.date) gs.deleteRow(i + 1);
+      if (toDateStr(gData[i][0]) === data.date) gs.deleteRow(i + 1);
     }
     (data.gym_exercises || []).forEach(function(ex) {
       gs.appendRow([data.date, data.gym_routine, ex.name, ex.sets, ex.reps, ex.weight]);
     });
 
-    // ACTIVITIES
+    // ACTIVITIES — delete today's rows then re-append
     var as = ss.getSheetByName('Activities') || ss.insertSheet('Activities');
     if (as.getLastRow() === 0) as.appendRow(['Date','Time','Type','Duration (min)','Notes']);
     var aData = as.getDataRange().getValues();
     for (var i = aData.length - 1; i >= 1; i--) {
-      if (aData[i][0] === data.date) as.deleteRow(i + 1);
+      if (toDateStr(aData[i][0]) === data.date) as.deleteRow(i + 1);
     }
     (data.activities || []).forEach(function(a) {
       as.appendRow([data.date, a.time, a.type, a.duration, a.notes]);
@@ -847,7 +853,8 @@ function getTrends() {
       var nData = ns.getDataRange().getValues();
       var nMap = {};
       for (var i = 1; i < nData.length; i++) {
-        nMap[nData[i][0]] = nData[i];
+        var dk = nData[i][0] instanceof Date ? nData[i][0].toISOString().slice(0,10) : String(nData[i][0]).slice(0,10);
+        nMap[dk] = nData[i];
       }
       dates.forEach(function(d) {
         var row = nMap[d];
@@ -864,7 +871,7 @@ function getTrends() {
       var gData = gs.getDataRange().getValues();
       var gSeen = {};
       for (var i = 1; i < gData.length; i++) {
-        var d = gData[i][0];
+        var d = gData[i][0] instanceof Date ? gData[i][0].toISOString().slice(0,10) : String(gData[i][0]).slice(0,10);
         if (dates.indexOf(d) >= 0 && !gSeen[d]) {
           gSeen[d] = true;
           var dp = d.split('-');
